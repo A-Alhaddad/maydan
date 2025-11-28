@@ -1,5 +1,5 @@
 // import 'package:maydan/pages/out_boarding/out_boarding_screen.dart';
-import 'package:maydan/page/login&regiester/signIn.dart';
+import 'package:maydan/page/login&regiester/SignIn.dart';
 import 'package:maydan/server/auth_server.dart';
 import 'package:maydan/server/server_user.dart';
 import 'package:maydan/widgets/my_library.dart';

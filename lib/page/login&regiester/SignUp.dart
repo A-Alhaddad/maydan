@@ -1,15 +1,18 @@
+import 'package:maydan/page/login&regiester/SignIn.dart';
+import 'package:maydan/page/login&regiester/otp.dart';
 import 'package:maydan/widgets/my_library.dart';
 
-class SignIn extends StatelessWidget {
-  SignIn({super.key});
+class SignUp extends StatelessWidget {
+  SignUp({super.key});
 
+  final TextEditingController nameCtrl = TextEditingController();
   final TextEditingController phoneCtrl = TextEditingController();
   final TextEditingController passCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
-      id: 'SignIn',
+      id: 'SignUp',
       init: AppGet(),
       builder: (controller) {
         return GestureDetector(
@@ -17,25 +20,34 @@ class SignIn extends StatelessWidget {
             FocusScope.of(context).unfocus();
           },
           child: Scaffold(
-            resizeToAvoidBottomInset: false,
             backgroundColor: Colors.transparent,
+            resizeToAvoidBottomInset: false,
             body: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 120.h),
-
                   CustomText(
-                    "signInTitle".tr,
+                    "signUpTitle".tr,
                     fontSize: 28.sp,
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                     textAlign: TextAlign.start,
                   ),
-
                   SizedBox(height: 40.h),
-
+                  CustomTextField(
+                    label: "userName",
+                    hint: "enterUserName",
+                    controller: nameCtrl,
+                    keyboardType: TextInputType.name,
+                    suffixIcon: Icon(
+                      Icons.person_outline,
+                      color: Colors.white,
+                      size: 22.sp,
+                    ),
+                  ),
+                  SizedBox(height: 25.h),
                   CustomTextField(
                     label: "phoneNumber",
                     hint: "enterPhone",
@@ -47,41 +59,19 @@ class SignIn extends StatelessWidget {
                       size: 22.sp,
                     ),
                   ),
-
                   SizedBox(height: 25.h),
-
                   CustomTextField(
                     label: "password",
                     hint: "enterPassword",
                     controller: passCtrl,
                     isPassword: true,
                   ),
-
-                  SizedBox(height: 12.h),
-
-                  GestureDetector(
-                    onTap: () {
-                      FocusScope.of(context).unfocus();
-                    },
-                    child: Align(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: CustomText(
-                        "forgetPassword".tr,
-                        color: AppColors.green,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        textAlign: TextAlign.end,
-                      ),
-                    ),
-                  ),
-
-                  const Spacer(),
-
+                  Spacer(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomText(
-                        "noAccount".tr,
+                        "haveAccount".tr,
                         color: Colors.white,
                         fontSize: 14.sp,
                       ),
@@ -89,9 +79,12 @@ class SignIn extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           FocusScope.of(context).unfocus();
+                          // controller.goToSignIn()
+                          Get.off(()=>SignIn());
                         },
                         child: CustomText(
-                          "createAccount".tr,
+                          "signInNow".tr,
+
                           color: AppColors.green,
                           fontSize: 14.sp,
                           fontWeight: FontWeight.bold,
@@ -99,17 +92,15 @@ class SignIn extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   SizedBox(height: 50.h),
-
                   CustomMainButton(
-                    title: "signInBtn",
+                    title: "continueVerifyBtn",
                     onTap: () async {
                       FocusScope.of(context).unfocus();
                       await Future.delayed(const Duration(seconds: 3));
+                      Get.to(()=>OTP(isFromSignUp: true,));
                     },
                   ),
-
                   SizedBox(height: 50.h),
                 ],
               ),

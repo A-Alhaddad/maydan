@@ -10,7 +10,8 @@ import '../widgets/my_library.dart';
 class AppGet extends GetxController {
   static AppGet get to => Get.put(AppGet());
   late Locale appLocale;
-
+  String? otpErrorMessage;
+  String isValidCode = "123456";
   @override
   void onInit() {
     super.onInit();
@@ -25,7 +26,8 @@ class AppGet extends GetxController {
   }
 
   Future<void> changeLanguage(String langCode, String countryCode) async {
-    await AppPreferences().saveLocale(countryCode: countryCode , languageCode: langCode);
+    await AppPreferences()
+        .saveLocale(countryCode: countryCode, languageCode: langCode);
     appLocale = Locale(langCode, countryCode);
     Get.updateLocale(appLocale);
     update();
@@ -34,5 +36,10 @@ class AppGet extends GetxController {
   String urlWebApp = 'https://google.com';
   int indexBodyHome = 0;
 
-
+  afterLoginOrRegister(
+      {bool fromLogin = false,
+      bool fromRegister = false,
+      bool fromChangePassword = false}) {
+    // Get.offAll(()=>Home());
+  }
 }
