@@ -1,6 +1,8 @@
 import 'package:maydan/splash.dart';
 import 'package:maydan/widgets/my_library.dart';
 
+import 'lang/my_translations.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppPreferences().initPreferences();
@@ -31,6 +33,7 @@ class _MyAppState extends State<MyApp> {
       builder: (context, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
+          translations: MyTranslations(),
           builder: (context, widget) {
             final size = MediaQuery.of(context).size;
             return Stack(

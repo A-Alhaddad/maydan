@@ -3,45 +3,43 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomText extends StatelessWidget {
-  String? text;
-  double? fontSize;
-  TextAlign? textAlign;
-  Color? color;
-  bool? underline;
-  FontWeight? fontWeight;
-  int? maxLines;
-  String? fontFamily;
+  final String? text;
+  final double? fontSize;
+  final TextAlign? textAlign;
+  final Color? color;
+  final bool underline;
+  final FontWeight? fontWeight;
+  final int? maxLines;
+  final bool styleLight;
 
-  CustomText(this.text,
-      {this.fontSize,
-      this.textAlign,
-      this.color,
-      this.fontWeight,
-      this.underline = false,
-      this.maxLines,
-      this.fontFamily});
+  const CustomText(
+      this.text, {
+        super.key,
+        this.fontSize,
+        this.textAlign,
+        this.color,
+        this.fontWeight,
+        this.underline = false,
+        this.maxLines,
+        this.styleLight = true,
+      });
 
   @override
   Widget build(BuildContext context) {
+    final FontWeight finalWeight =
+        fontWeight ??
+            (styleLight ? FontWeight.w400 : FontWeight.w300);
+
     return Text(
-      text ?? 'استبدل هذا النص',
+      text ?? '',
       textAlign: textAlign ?? TextAlign.start,
       maxLines: maxLines,
       overflow: maxLines != null ? TextOverflow.ellipsis : null,
-      // style: TextStyle(
-      //   fontWeight: fontWeight ?? FontWeight.w500,
-      //   fontSize: fontSize ?? 18.sp,
-      //   color: color ?? Colors.black,
-      //   fontFamily: fontFamily ?? (fontWeight == FontWeight.bold ? 'IBM1' : 'IBM'),
-      //   decoration: underline! ? TextDecoration.underline : TextDecoration.none,
-      // ),
-      style: GoogleFonts.ibmPlexSansArabic(
-        decoration: underline! ? TextDecoration.underline : TextDecoration.none,
-        fontSize: fontSize ?? 17.sp,
+      style: GoogleFonts.alexandria(
+        decoration: underline ? TextDecoration.underline : TextDecoration.none,
+        fontSize: fontSize ?? 15.sp,
         color: color ?? Colors.black,
-        fontWeight: fontWeight == FontWeight.bold
-            ? FontWeight.bold
-            : fontWeight ?? FontWeight.w400,
+        fontWeight: finalWeight,
       ),
     );
   }

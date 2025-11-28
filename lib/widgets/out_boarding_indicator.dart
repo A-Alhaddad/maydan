@@ -16,10 +16,10 @@ class OutBoardingIndicator extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: selected ? AppColors.secondaryColor : Colors.transparent,
+          color: selected ? AppColors.black : Colors.transparent,
           width: 2,
         ),
-        color: selected ? AppColors.secondaryColor : AppColors.secondaryColor.withOpacity(0.3),
+        color: selected ? AppColors.black : AppColors.black.withOpacity(0.3),
       ),
     );
   }

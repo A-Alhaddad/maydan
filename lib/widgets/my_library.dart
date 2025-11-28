@@ -8,6 +8,7 @@ export 'package:maydan/value/shadow.dart';
 export 'package:maydan/widgets/custom_text.dart';
 export 'package:maydan/widgets/custom_image.dart';
 export 'package:maydan/services/preferences/app_preferences.dart';
-export 'package:maydan/widgets/app_text_field.dart';
+export 'package:maydan/widgets/custom_text_field.dart';
 export 'package:maydan/value/constant.dart';
 export 'package:url_launcher/url_launcher.dart';
+export 'package:maydan/widgets/custom_main_button.dart';

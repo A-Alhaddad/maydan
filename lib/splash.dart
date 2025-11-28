@@ -1,4 +1,5 @@
 // import 'package:maydan/pages/out_boarding/out_boarding_screen.dart';
+import 'package:maydan/page/login&regiester/signIn.dart';
 import 'package:maydan/server/auth_server.dart';
 import 'package:maydan/server/server_user.dart';
 import 'package:maydan/widgets/my_library.dart';
@@ -17,7 +18,7 @@ class _SplashState extends State<Splash> {
   void initState() {
     var delay = Duration(seconds: 3);
     Future.delayed(delay, () async {
-      // nextScreen();
+      nextScreen();
     });
     super.initState();
   }
@@ -41,6 +42,10 @@ class _SplashState extends State<Splash> {
         ),
       ),
     );
+  }
+
+  nextScreen(){
+    Get.off(()=>SignIn());
   }
 }
 
