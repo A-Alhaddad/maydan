@@ -113,6 +113,7 @@ class SignIn extends StatelessWidget {
                     onTap: () async {
                       FocusScope.of(context).unfocus();
                       await Future.delayed(const Duration(seconds: 3));
+                      controller.afterLoginOrRegister(fromLogin: true);
                     },
                   ),
 

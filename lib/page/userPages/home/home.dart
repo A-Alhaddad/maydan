@@ -1,0 +1,658 @@
+import 'package:maydan/page/userPages/home/shimmer.dart';
+import 'package:maydan/widgets/my_library.dart';
+
+import '../../../widgets/notification_Button.dart';
+import '../../../widgets/sports_tabs.dart';
+import '../service/coaches/coach_details_page.dart';
+import '../service/matches/match_reservation_page.dart';
+
+class Home extends StatelessWidget {
+  Home({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetBuilder<AppGet>(
+      id: 'Home',
+      builder: (controller) {
+        if (controller.isHomeUserLoading) {
+          return const HomeShimmer();
+        }
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Column(
+            children: [
+              SizedBox(height: 30.h),
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildHeader(controller),
+                    SizedBox(height: 24.h),
+                    _buildLastMatchCard(),
+                    SizedBox(height: 24.h),
+                    SportsTabs(
+                      items: controller.sportsList,
+                      selectedIndex: controller.selectedSportTapIndex,
+                      onTap: controller.changeSport,
+                    ),
+                    SizedBox(height: 24.h),
+                    _buildActionsRow(),
+                    SizedBox(height: 24.h),
+                    _buildReservedMatchesSection(),
+                    SizedBox(height: 24.h),
+                    _buildReservedStadiumsSection(),
+                    SizedBox(height: 24.h),
+                    _buildCoachesSection(),
+                    SizedBox(height: 10.h),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader(AppGet controller) {
+    final userName = 'عبد الله!';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomText(
+                "${'homeHello'.tr} $userName",
+                fontSize: 14.sp,
+                color: Colors.white,
+              ),
+              SizedBox(height: 15.h),
+              CustomText(
+                "homeReadyTitle".tr,
+                fontSize: 24.sp,
+                color: AppColors.green,
+                fontWeight: FontWeight.w600,
+              ),
+            ],
+          ),
+        ),
+        NotificationButton(
+          onTap: () {
+            controller.openNotificationsPage();
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLastMatchCard() {
+    const stadiumName = "ملعب السالمية";
+    final lastMatchText = "مباراتك الأخيرة كانت في $stadiumName";
+
+    return GestureDetector(
+      onTap: () {
+        printLog('احجز مجدداً');
+      },
+      child: Container(
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(24.r),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.w),
+                    child: CustomText(
+                      lastMatchText,
+                      fontSize: 18.sp,
+                      color: Colors.white,
+                      maxLines: 2,
+                      textAlign: TextAlign.start,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24.w,
+                      vertical: 10.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.darkIndigo,
+                      borderRadius: BorderRadius.circular(24.r),
+                    ),
+                    child: CustomText(
+                      "homeBookAgain".tr,
+                      fontSize: 16.sp,
+                      color: AppColors.green,
+                      fontWeight: FontWeight.w600,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 20.w),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(18.r),
+              child: SizedBox(
+                width: 130.w,
+                height: 90.h,
+                child: CustomPngImage(
+                  imageName: 'stadiumImg',
+                  boxFit: BoxFit.fill,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionsRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _actionItem("homeActionSearchMatch", "icon1", 0),
+        _actionItem("homeActionCompete", "icon2", 1),
+        _actionItem("homeActionTrain", "icon3", 2),
+        _actionItem("homeActionBook", "icon4", 3),
+      ],
+    );
+  }
+
+  Widget _actionItem(String textKey, String iconName, int nameOnTap) {
+    return GestureDetector(
+      onTap: () {
+        if (nameOnTap == 0) {
+          /// ابحث عن مبارة
+          AppGet.to.changeBottomNav(indexBottomNav: 1, indexService: 1);
+        } else if (nameOnTap == 1) {
+          /// نافس
+          AppGet.to.changeBottomNav(
+              indexBottomNav: 1, indexService: 1, selectMatchType: 1);
+        } else if (nameOnTap == 2) {
+          /// تدرب
+          AppGet.to.changeBottomNav(indexBottomNav: 1, indexService: 3);
+        } else {
+          /// احجز ملعب
+          AppGet.to.changeBottomNav(
+              indexBottomNav: 1, indexService: 4, selectMatchType: 0);
+        }
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Container(
+            width: 70.w,
+            height: 70.w,
+            decoration: BoxDecoration(
+              color: AppColors.green,
+              borderRadius: BorderRadius.circular(18.r),
+            ),
+            child: Center(
+              child: CustomSvgImage(
+                imageName: iconName,
+                width: 35.w,
+                height: 35.w,
+              ),
+            ),
+          ),
+          SizedBox(height: 8.h),
+          SizedBox(
+            width: 70.w,
+            child: CustomText(
+              textKey.tr,
+              fontSize: 14.sp,
+              color: Colors.white,
+              maxLines: 2,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReservedMatchesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          iconName: "icon5",
+          title: "homeReservedMatches".tr,
+          showMore: true,
+          moreText: "homeMore".tr,
+          onMoreTap: () {
+            printLog('more');
+            AppGet.to.changeBottomNav(
+                indexBottomNav: 1, indexService: 1, selectMatchType: -1);
+          },
+        ),
+        SizedBox(height: 16.h),
+        SizedBox(
+          height: 140.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: AppGet.to.matches.length,
+            itemBuilder: (context, index) {
+              final item = AppGet.to.matches[index];
+              return Padding(
+                padding: EdgeInsetsDirectional.only(
+                  start: index == 0 ? 0 : 12.w,
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    Get.to(
+                      () => MatchReservationPage(
+                        matchId: item["id"],
+                      ),
+                    );
+                  },
+                  child: _matchCard(item),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _matchCard(Map<String, String> match) {
+    return Container(
+      width: 370.w,
+      height: 140.h,
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(26.r),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(22.r),
+            child: SizedBox(
+              width: 110.w,
+              height: 100.h,
+              child: CustomPngImage(
+                imageName: match["photo"] ?? "",
+                boxFit: BoxFit.fill,
+              ),
+            ),
+          ),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomText(
+                  match["name"] ?? "",
+                  fontSize: 18.sp,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  textAlign: TextAlign.start,
+                ),
+                SizedBox(height: 12.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 28.w,
+                      height: 28.w,
+                      decoration: BoxDecoration(
+                        color: AppColors.green,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.calendar_month,
+                        size: 16.sp,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(width: 6.w),
+                    CustomText(
+                      match["date"] ?? "",
+                      fontSize: 14.sp,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 14.w),
+                    Container(
+                      width: 28.w,
+                      height: 28.w,
+                      decoration: BoxDecoration(
+                        color: AppColors.green,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.access_time,
+                        size: 16.sp,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(width: 6.w),
+                    CustomText(
+                      match["time"] ?? "",
+                      fontSize: 14.sp,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              CustomSvgImage(
+                                imageName: 'icon6',
+                                color: AppColors.green,
+                                height: 15.h,
+                              ),
+                              SizedBox(width: 6.w),
+                              CustomText(
+                                match["available"] ?? "",
+                                fontSize: 14.sp,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8.h),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 18.sp,
+                                color: AppColors.green,
+                              ),
+                              SizedBox(width: 6.w),
+                              CustomText(
+                                match["location"] ?? "",
+                                fontSize: 14.sp,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    CustomText(
+                      match["price"] ?? "",
+                      fontSize: 20.sp,
+                      color: AppColors.green,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReservedStadiumsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          iconName: "icon8",
+          title: "homeReservedStadiums".tr,
+          showMore: true,
+          moreText: "homeExtraOptions".tr,
+          onMoreTap: () {
+            printLog('more homeExtraOptions');
+            AppGet.to.changeBottomNav(
+                indexBottomNav: 1, indexService: 4, selectMatchType: 0);
+          },
+        ),
+        SizedBox(height: 16.h),
+        SizedBox(
+          height: 320.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: AppGet.to.stadiums.length,
+            itemBuilder: (context, index) {
+              final item = AppGet.to.stadiums[index];
+              return Padding(
+                padding: EdgeInsets.only(
+                  right: index == 0 ? 0 : 12.w,
+                ),
+                child: GestureDetector(
+                    onTap: () {
+                      AppGet.to.changeBottomNav(
+                          indexBottomNav: 1,
+                          indexService: 4,
+                          selectMatchType: 0,
+                          selectStadiumData: item);
+                    },
+                    child: _stadiumCard(item)),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _stadiumCard(Map<String, String> stadium) {
+    return Container(
+      width: 340.w,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(26.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 190.h,
+            width: double.infinity,
+            padding: EdgeInsets.only(top: 10.h, right: 10.w, left: 10.w),
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(26.r),
+                bottom: Radius.circular(26.r),
+              ),
+              child: SizedBox(
+                height: 190.h,
+                width: double.infinity,
+                child: CustomPngImage(
+                  imageName: stadium["image"] ?? "",
+                  boxFit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomText(
+                  stadium["name"] ?? "",
+                  fontSize: 18.sp,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  textAlign: TextAlign.right,
+                ),
+                SizedBox(height: 17.h),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 3.w,
+                              ),
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 18.sp,
+                                color: AppColors.green,
+                              ),
+                              SizedBox(width: 6.w),
+                              CustomText(
+                                stadium["location"] ?? "",
+                                fontSize: 14.sp,
+                                color: Colors.white,
+                                maxLines: 1,
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8.h),
+                          Row(
+                            children: [
+                              CustomSvgImage(
+                                imageName: 'icon7',
+                                color: AppColors.green,
+                                height: 18.h,
+                              ),
+                              SizedBox(width: 6.w),
+                              CustomText(
+                                stadium["size"] ?? "",
+                                fontSize: 14.sp,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CustomText(
+                              stadium["price"] ?? "",
+                              fontSize: 20.sp,
+                              color: AppColors.green,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            SizedBox(height: 2.h),
+                            CustomText(
+                              "homeCurrencyPerHour".tr,
+                              fontSize: 11.sp,
+                              color: AppColors.green,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCoachesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          iconName: "icon9",
+          title: "homeCoachesNearYou".tr,
+          showMore: true,
+          moreText: "homeExtraOptions".tr,
+          onMoreTap: () {
+            printLog('more homeExtraOptions coach');
+            AppGet.to.changeBottomNav(indexBottomNav: 1, indexService: 3);
+          },
+        ),
+        SizedBox(height: 16.h),
+        SizedBox(
+          height: 180.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: AppGet.to.coaches.length,
+            padding: EdgeInsets.zero,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: EdgeInsets.only(right: index == 0 ? 0 : 18.w),
+                child: GestureDetector(
+                    onTap: () {
+                      printLog(AppGet.to.coaches[index]['id']);
+                      Get.to(
+                        () => CoachDetailsPage(
+                          coach: AppGet.to.coaches[index],
+                        ),
+                      );
+                    },
+                    child: _coachCard(AppGet.to.coaches[index])),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _coachCard(Map coach) {
+    return Container(
+      width: 130.w,
+      padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22.r),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.12),
+          width: 1.2,
+        ),
+      ),
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 35.r,
+            backgroundImage: AssetImage("assets/images/${coach['image']}.png"),
+          ),
+          SizedBox(height: 10.h),
+          CustomText(
+            coach["name"],
+            fontSize: 16.sp,
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            maxLines: 2,
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 10.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomText(
+                coach["rate"],
+                fontSize: 15.sp,
+                color: AppColors.green,
+                fontWeight: FontWeight.w600,
+              ),
+              SizedBox(width: 3.w),
+              Icon(Icons.star, color: AppColors.green, size: 15.sp),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

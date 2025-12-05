@@ -12,3 +12,7 @@ export 'package:maydan/widgets/custom_text_field.dart';
 export 'package:maydan/value/constant.dart';
 export 'package:url_launcher/url_launcher.dart';
 export 'package:maydan/widgets/custom_main_button.dart';
+export 'package:maydan/widgets/section_header.dart';
+export '../../widgets/back_Button.dart';
+export 'package:maydan/page/userPages/main_User.dart';
+

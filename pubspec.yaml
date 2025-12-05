@@ -21,6 +21,7 @@ dependencies:
   logger: ^2.4.0
   universal_platform: ^1.1.0
   loading_animation_widget: ^1.2.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
