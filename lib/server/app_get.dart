@@ -122,18 +122,21 @@ class AppGet extends GetxController {
       "image": "coach_1",
       "name": "عبد الرحمن الحربي",
       "rate": "4.5",
+      "type": "مدرب كرة سلة",
     },
     {
       "id": "2",
       "image": "coach_2",
       "name": "نوار السعدي",
       "rate": "4.7",
+      "type": "مدرب تنس طاولة",
     },
     {
       "id": "3",
       "image": "coach_3",
       "name": "فهد القحطاني",
       "rate": "4.2",
+      "type": "مدرب كرة قدم",
     }
   ];
 
@@ -162,6 +165,11 @@ class AppGet extends GetxController {
       "size": "40x28 م",
       "image": "stadiumImg22",
     },
+  ];
+
+  final List<Map<String, String>> bankCards = [
+    {"type": "visa", "image": "visa" , "name" : "Mashaal Al Rashid" , "number" : "3590 0899 4961 7102"},
+    {"type": "master", "image": "master" , "name" : "Mashaal Al Rashid" , "number" : "3590 0899 4961 7102"},
   ];
 
   //////////////////// Functions ///////////////////////////

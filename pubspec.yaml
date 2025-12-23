@@ -24,15 +24,26 @@ dependencies:
   shimmer: ^3.0.0
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.1
   flutter_test:
     sdk: flutter
 
+flutter_icons:
+  image_path_android: "assets/images/logoWithBackground.png"
+  image_path_ios: "assets/images/logoWithBackground.png"
+  android: true
+  ios: true
   flutter_lints: ^4.0.0
-flutter:
 
+flutter:
   uses-material-design: true
 
   assets:
     - assets/images/
     - assets/svg/
     - assets/fonts/
+
+  #   flutter pub get
+  #   flutter pub run flutter_launcher_icons:main
+  #   flutter clean
+  #   flutter run

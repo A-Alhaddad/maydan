@@ -40,12 +40,16 @@ class TextScreen extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 40.h,),
-                  CustomText(
-                    details,
-                    textAlign: TextAlign.justify,
-                    fontSize: 12.sp,
-                    color: Colors.white,
+                  Padding(
+                    padding:  EdgeInsets.symmetric(horizontal: 10.w),
+                    child: CustomText(
+                      details,
+                      textAlign: TextAlign.justify,
+                      fontSize: 16.sp,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300,
 
+                    ),
                   )
                 ]),
           );

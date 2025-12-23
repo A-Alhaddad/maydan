@@ -83,6 +83,7 @@ class MyTranslations extends Translations {
           "serviceGridChallenges": "التحديات",
           "serviceGridMatches": "المباريات",
           "serviceGridCoaches": "المدربون",
+          "serviceGridCoaches2": "المدربين",
           "serviceGridActivities": "الأنشطة الرياضية",
 
           // ---------- Match Type Tabs ----------
