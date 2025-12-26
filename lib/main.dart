@@ -42,6 +42,7 @@ class _MyAppState extends State<MyApp> {
                   imageName: 'background',
                   width: size.width,
                   height: size.height,
+                  boxFit: BoxFit.fill,
                 ),
                 MediaQuery(
                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),

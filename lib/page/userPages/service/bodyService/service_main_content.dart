@@ -36,23 +36,23 @@ class ServiceMainContent extends StatelessWidget {
             } else if (index == 1) {
               /// حجز ملعب
               AppGet.to.selectedMatchTypeIndex = 0;
-              AppGet.to.changeBottomNav(
+              AppGet.to.changeBottomNavUser(
                   indexBottomNav: 1, indexService: 4, selectMatchType: 0);            } else if (index == 2) {
               /// المباريات
               AppGet.to.selectedMatchTypeIndex = 0;
-              AppGet.to.changeBottomNav(indexBottomNav: 1, indexService: 1);
+              AppGet.to.changeBottomNavUser(indexBottomNav: 1, indexService: 1);
             } else if (index == 3) {
               /// التحديات
               AppGet.to.selectedMatchTypeIndex = 1;
-              AppGet.to.changeBottomNav(indexBottomNav: 1, indexService: 1);
+              AppGet.to.changeBottomNavUser(indexBottomNav: 1, indexService: 1);
             } else if (index == 4) {
               /// الأنشطة الرياضية
               AppGet.to.selectedMatchTypeIndex = 2;
-              AppGet.to.changeBottomNav(indexBottomNav: 1, indexService: 1);
+              AppGet.to.changeBottomNavUser(indexBottomNav: 1, indexService: 1);
             } else if (index == 5) {
               /// المدربون
               // ServiceSearchCoach
-              AppGet.to.changeBottomNav(indexBottomNav: 1, indexService: 3);
+              AppGet.to.changeBottomNavUser(indexBottomNav: 1, indexService: 3);
 
             }
           },

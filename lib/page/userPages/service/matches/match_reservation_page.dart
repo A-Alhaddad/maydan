@@ -228,7 +228,7 @@ class MatchReservationPage extends StatelessWidget {
                             matchSelect: match,
                           ),
 
-                          SizedBox(height: 30.h),
+                          SizedBox(height: 60.h),
                         ],
                       ),
                     ),
@@ -668,7 +668,7 @@ class MatchReservationPage extends StatelessWidget {
                           "${matchDate.toString()} | ${matchTime.toString()}",
                       stadiumName: stadiumName.toString(),
                       onDone: () {
-                        AppGet.to.changeBottomNav(indexBottomNav: 0);
+                        AppGet.to.changeBottomNavUser(indexBottomNav: 0);
                         Get.offAll(() => MainUserScreen());
                       },
                     ),

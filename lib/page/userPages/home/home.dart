@@ -177,17 +177,17 @@ class Home extends StatelessWidget {
       onTap: () {
         if (nameOnTap == 0) {
           /// ابحث عن مبارة
-          AppGet.to.changeBottomNav(indexBottomNav: 1, indexService: 1);
+          AppGet.to.changeBottomNavUser(indexBottomNav: 1, indexService: 1);
         } else if (nameOnTap == 1) {
           /// نافس
-          AppGet.to.changeBottomNav(
+          AppGet.to.changeBottomNavUser(
               indexBottomNav: 1, indexService: 1, selectMatchType: 1);
         } else if (nameOnTap == 2) {
           /// تدرب
-          AppGet.to.changeBottomNav(indexBottomNav: 1, indexService: 3);
+          AppGet.to.changeBottomNavUser(indexBottomNav: 1, indexService: 3);
         } else {
           /// احجز ملعب
-          AppGet.to.changeBottomNav(
+          AppGet.to.changeBottomNavUser(
               indexBottomNav: 1, indexService: 4, selectMatchType: 0);
         }
       },
@@ -236,7 +236,7 @@ class Home extends StatelessWidget {
           moreText: "homeMore".tr,
           onMoreTap: () {
             printLog('more');
-            AppGet.to.changeBottomNav(
+            AppGet.to.changeBottomNavUser(
                 indexBottomNav: 1, indexService: 1, selectMatchType: -1);
           },
         ),
@@ -419,7 +419,7 @@ class Home extends StatelessWidget {
           moreText: "homeExtraOptions".tr,
           onMoreTap: () {
             printLog('more homeExtraOptions');
-            AppGet.to.changeBottomNav(
+            AppGet.to.changeBottomNavUser(
                 indexBottomNav: 1, indexService: 4, selectMatchType: 0);
           },
         ),
@@ -437,7 +437,7 @@ class Home extends StatelessWidget {
                 ),
                 child: GestureDetector(
                     onTap: () {
-                      AppGet.to.changeBottomNav(
+                      AppGet.to.changeBottomNavUser(
                           indexBottomNav: 1,
                           indexService: 4,
                           selectMatchType: 0,
@@ -580,7 +580,7 @@ class Home extends StatelessWidget {
           moreText: "homeExtraOptions".tr,
           onMoreTap: () {
             printLog('more homeExtraOptions coach');
-            AppGet.to.changeBottomNav(indexBottomNav: 1, indexService: 3);
+            AppGet.to.changeBottomNavUser(indexBottomNav: 1, indexService: 3);
           },
         ),
         SizedBox(height: 16.h),

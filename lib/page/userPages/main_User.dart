@@ -56,7 +56,7 @@ class MainUserScreen extends StatelessWidget {
           final bool selected = controller.bottomNavIndex == index;
 
           return GestureDetector(
-            onTap: () => controller.changeBottomNav(indexBottomNav: index ),
+            onTap: () => controller.changeBottomNavUser(indexBottomNav: index ),
             child: Container(
               width: 60.w,
               height: 60.w,

@@ -28,7 +28,6 @@ class SignIn extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 120.h),
-
                   CustomText(
                     "signInTitle".tr,
                     fontSize: 28.sp,
@@ -36,9 +35,7 @@ class SignIn extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     textAlign: TextAlign.start,
                   ),
-
                   SizedBox(height: 40.h),
-
                   CustomTextField(
                     label: "phoneNumber",
                     hint: "enterPhone",
@@ -50,22 +47,18 @@ class SignIn extends StatelessWidget {
                       size: 22.sp,
                     ),
                   ),
-
                   SizedBox(height: 25.h),
-
                   CustomTextField(
                     label: "password",
                     hint: "enterPassword",
                     controller: passCtrl,
                     isPassword: true,
                   ),
-
                   SizedBox(height: 12.h),
-
                   GestureDetector(
                     onTap: () {
                       FocusScope.of(context).unfocus();
-                      Get.to(()=>ForgetPassword());
+                      Get.to(() => ForgetPassword());
                     },
                     child: Align(
                       alignment: AlignmentDirectional.centerEnd,
@@ -78,9 +71,7 @@ class SignIn extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   const Spacer(),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -93,8 +84,7 @@ class SignIn extends StatelessWidget {
                       GestureDetector(
                         onTap: () {
                           // FocusScope.of(context).unfocus();
-                          Get.off(()=>SignUp());
-
+                          Get.off(() => SignUp());
                         },
                         child: CustomText(
                           "createAccount".tr,
@@ -105,18 +95,18 @@ class SignIn extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   SizedBox(height: 50.h),
-
                   CustomMainButton(
                     title: "signInBtn",
                     onTap: () async {
                       FocusScope.of(context).unfocus();
                       await Future.delayed(const Duration(seconds: 3));
-                      controller.afterLoginOrRegister(fromLogin: true);
+                      controller.afterLoginOrRegister(
+                          fromLogin: true,
+                          password: passCtrl.text,
+                          userName: phoneCtrl.text);
                     },
                   ),
-
                   SizedBox(height: 50.h),
                 ],
               ),

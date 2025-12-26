@@ -168,8 +168,18 @@ class AppGet extends GetxController {
   ];
 
   final List<Map<String, String>> bankCards = [
-    {"type": "visa", "image": "visa" , "name" : "Mashaal Al Rashid" , "number" : "3590 0899 4961 7102"},
-    {"type": "master", "image": "master" , "name" : "Mashaal Al Rashid" , "number" : "3590 0899 4961 7102"},
+    {
+      "type": "visa",
+      "image": "visa",
+      "name": "Mashaal Al Rashid",
+      "number": "3590 0899 4961 7102"
+    },
+    {
+      "type": "master",
+      "image": "master",
+      "name": "Mashaal Al Rashid",
+      "number": "3590 0899 4961 7102"
+    },
   ];
 
   //////////////////// Functions ///////////////////////////
@@ -186,7 +196,7 @@ class AppGet extends GetxController {
     update();
   }
 
-  void changeBottomNav(
+  void changeBottomNavUser(
       {required int indexBottomNav,
       int indexService = 0,
       int selectMatchType = -1,
@@ -263,11 +273,20 @@ class AppGet extends GetxController {
   afterLoginOrRegister(
       {bool fromLogin = false,
       bool fromRegister = false,
-      bool fromChangePassword = false}) {
+      bool fromChangePassword = false,
+      String? userName,
+      String? password}) {
     isHomeUserLoading = true;
-    changeBottomNav(indexBottomNav: 0 ,indexService: 0);
-    Get.offAll(() => MainUserScreen());
-    loadHomeData();
+    if (userName == '1' || userName == '') {
+      /// مستخدم عادي
+      changeBottomNavUser(indexBottomNav: 0, indexService: 0);
+      Get.offAll(() => MainUserScreen());
+      loadHomeData();
+    } else if (userName == '2') {
+      /// مستخدم خدمات ومنتجات
+    } else if (userName == '3') {
+      /// مستخدم مدير ملاعب
+    }
   }
 
   Future<void> loadHomeData() async {
