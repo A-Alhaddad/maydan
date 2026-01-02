@@ -419,10 +419,10 @@ class OrderModel {
   final int ballsCount;
   final int price;
   final String imageName;
-
   final bool showMetaRow;
   final String? timeRange;
   final String? dateText;
+
 
   OrderModel({
     required this.title,

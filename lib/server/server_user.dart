@@ -33,7 +33,7 @@ class ServerUser {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print(response.data);
-        appGet.countries.value = response.data['data'];
+        // appGet.countries.value = response.data['data'];
         print('appGet.countries.value ${appGet.countries.toString()}');
       } else {
         print("loginUserUrl ${response.data}");

@@ -1,4 +1,5 @@
 import 'package:maydan/page/managerPages/homeManager/shimmerManager.dart';
+import 'package:maydan/page/managerPages/orders/ordersManagement.dart';
 import 'dart:math' as math;
 import 'package:maydan/widgets/my_library.dart';
 import '../../../widgets/notification_Button.dart';
@@ -13,7 +14,7 @@ class HomeManager extends StatelessWidget {
       builder: (controller) {
         final String seasonText = "24/25";
 
-        if (controller.isHomeLoading) {
+        if (controller.isHomeUserLoading) {
           return const HomeShimmerManager();
         }
         return GestureDetector(
@@ -126,7 +127,9 @@ class HomeManager extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final item = controller.newOrders[index];
                       return GestureDetector(
-                          onTap: () {}, child: _OrderCard(item: item));
+                        onTap: () {},
+                        child: OrderCard(item: item),
+                      );
                     },
                   ),
                   SizedBox(height: 30.h),
@@ -246,7 +249,6 @@ class _PillChip extends StatelessWidget {
     );
   }
 }
-
 
 class _ChartCard extends StatelessWidget {
   final double height;
@@ -428,10 +430,10 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-class _OrderCard extends StatelessWidget {
-  final Map<String, dynamic> item;
+class OrderCard extends StatelessWidget {
+  final OrderModel item;
 
-  const _OrderCard({required this.item});
+  const OrderCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -452,7 +454,7 @@ class _OrderCard extends StatelessWidget {
               width: 110.w,
               height: 100.h,
               child: CustomPngImage(
-                imageName: item["image"]?.toString() ?? "ball1",
+                imageName: item.imageName ?? "ball1",
                 boxFit: BoxFit.fill,
               ),
             ),
@@ -463,7 +465,7 @@ class _OrderCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CustomText(
-                  item["title"]?.toString() ?? "",
+                  item.title,
                   fontSize: 18.sp,
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -485,7 +487,7 @@ class _OrderCard extends StatelessWidget {
                               ),
                               SizedBox(width: 6.w),
                               CustomText(
-                                item["customer"]?.toString() ?? "",
+                                item.customer,
                                 fontSize: 14.sp,
                                 color: Colors.white,
                               ),
@@ -502,7 +504,7 @@ class _OrderCard extends StatelessWidget {
                               ),
                               SizedBox(width: 6.w),
                               CustomText(
-                                "${item["count"] ?? 0}",
+                                "${item.ballsCount.toString()}",
                                 fontSize: 14.sp,
                                 color: Colors.white,
                               ),
@@ -512,7 +514,7 @@ class _OrderCard extends StatelessWidget {
                       ),
                     ),
                     CustomText(
-                      item["price"].toString() +
+                      item.price.toString() +
                           ' ' +
                           'matchReservationCurrency'.tr,
                       fontSize: 18.sp,
@@ -540,7 +542,7 @@ class _OrderCard extends StatelessWidget {
                     ),
                     SizedBox(width: 6.w),
                     CustomText(
-                      item["date"] ?? "",
+                      item.dateText.toString(),
                       fontSize: 14.sp,
                       color: Colors.white,
                     ),
@@ -560,7 +562,7 @@ class _OrderCard extends StatelessWidget {
                     ),
                     SizedBox(width: 6.w),
                     CustomText(
-                      item["time"]?.toString() ?? "",
+                      item.timeRange.toString(),
                       fontSize: 14.sp,
                       color: Colors.white,
                     ),
