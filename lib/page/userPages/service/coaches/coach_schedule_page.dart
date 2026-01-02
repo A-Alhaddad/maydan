@@ -114,6 +114,12 @@ class _CoachSchedulePageState extends State<CoachSchedulePage> {
     final coachName = widget.coach["name"] ?? "";
     final coachRating = widget.coach["rate"]?.toString() ?? "";
     final coachImage = widget.coach["image"] ?? "coach_1";
+    final coachImageUrl = widget.coach["imageUrl"] ?? "";
+    final ImageProvider<Object> avatar =
+        coachImageUrl.toString().isNotEmpty
+            ? NetworkImage(coachImageUrl) as ImageProvider<Object>
+            : AssetImage("assets/images/$coachImage.png")
+                as ImageProvider<Object>;
     final String price = _packages[selectedPackageIndex]["price"];
     final currentDays = _daysByPackage[selectedPackageIndex];
 
@@ -139,8 +145,7 @@ class _CoachSchedulePageState extends State<CoachSchedulePage> {
                     SizedBox(height: 10.h),
                     CircleAvatar(
                       radius: 45.r,
-                      backgroundImage:
-                          AssetImage("assets/images/$coachImage.png"),
+                      backgroundImage: avatar,
                     ),
                     SizedBox(height: 14.h),
                     CustomText(

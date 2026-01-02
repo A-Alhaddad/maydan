@@ -36,12 +36,11 @@ class StadiumBooking extends StatelessWidget {
 
   int selectedDayIndex = -1;
   Set<int> selectedTimeIndices = {};
-  Map<String, String> selectStadium = {};
+  Map<String, dynamic> selectStadium = {};
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder(
-      init: AppGet(),
       id: 'StadiumBooking',
       builder: (controller) {
         return Column(
@@ -191,6 +190,7 @@ class StadiumBooking extends StatelessWidget {
                   final item = selected
                       ? AppGet.to.selectStadium
                       : AppGet.to.stadiums[index];
+                  final imageUrl = item['imageUrl'] ?? '';
                   return GestureDetector(
                     onTap: () {
                       if (!selected) {
@@ -219,10 +219,15 @@ class StadiumBooking extends StatelessWidget {
                           Container(
                             height: 110.h,
                             width: 120.w,
-                            child: CustomPngImage(
-                              imageName: item['image'],
-                              boxFit: BoxFit.fill,
-                            ),
+                            child: imageUrl.toString().isNotEmpty
+                                ? CustomPngImageNetwork(
+                                    imageUrl: imageUrl,
+                                    boxFit: BoxFit.cover,
+                                  )
+                                : CustomPngImage(
+                                    imageName: item['image'],
+                                    boxFit: BoxFit.fill,
+                                  ),
                           ),
                           SizedBox(width: 14.w),
                           Expanded(

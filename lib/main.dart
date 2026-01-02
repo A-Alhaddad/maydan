@@ -27,9 +27,11 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(450, 844),
+      // Close to common Android portrait logical size (Pixel 9 Pro ~411dp width)
+      designSize: const Size(411, 915),
       minTextAdapt: true,
       splitScreenMode: true,
+      useInheritedMediaQuery: true,
       builder: (context, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
@@ -45,7 +47,9 @@ class _MyAppState extends State<MyApp> {
                   boxFit: BoxFit.fill,
                 ),
                 MediaQuery(
-                  data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: const TextScaler.linear(1.0),
+                  ),
                   child: widget!,
                 ),
               ],

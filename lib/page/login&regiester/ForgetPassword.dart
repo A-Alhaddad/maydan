@@ -1,4 +1,3 @@
-import 'package:maydan/page/login&regiester/otp.dart';
 import 'package:maydan/widgets/my_library.dart';
 
 class ForgetPassword extends StatelessWidget {
@@ -10,7 +9,6 @@ class ForgetPassword extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
       id: 'ForgetPassword',
-      init: AppGet(),
       builder: (controller) {
         return GestureDetector(
           onTap: () {
@@ -19,42 +17,55 @@ class ForgetPassword extends StatelessWidget {
           child: Scaffold(
             backgroundColor: Colors.black.withOpacity(0.001),
             resizeToAvoidBottomInset: false,
-            body: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 120.h),
-                  CustomText(
-                    "forgetPasswordTitle".tr,
-                    fontSize: 28.sp,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  SizedBox(height: 40.h),
-                  CustomTextField(
-                    label: "phoneNumber",
-                    hint: "enterPhone",
-                    controller: phoneCtrl,
-                    keyboardType: TextInputType.phone,
-                    suffixIcon: Icon(
-                      Icons.dialpad,
-                      color: Colors.white,
-                      size: 22.sp,
+            body: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 80.h),
+                          CustomText(
+                            "forgetPasswordTitle".tr,
+                            fontSize: 28.sp,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          SizedBox(height: 40.h),
+                          CustomTextField(
+                            label: "phoneNumber",
+                            hint: "enterPhone",
+                            controller: phoneCtrl,
+                            keyboardType: TextInputType.phone,
+                            suffixIcon: Icon(
+                              Icons.dialpad,
+                              color: Colors.white,
+                              size: 22.sp,
+                            ),
+                          ),
+                          const Spacer(),
+                          CustomMainButton(
+                            title: "continueVerifyBtn",
+                            onTap: () async {
+                              FocusScope.of(context).unfocus();
+                              await controller.loginWithPhone(
+                                mobile: phoneCtrl.text.trim(),
+                                context: context,
+                                goToReset: true,
+                              );
+                            },
+                          ),
+                          SizedBox(height: 30.h),
+                        ],
+                      ),
                     ),
                   ),
-                  const Spacer(),
-                  CustomMainButton(
-                    title: "continueVerifyBtn",
-                    onTap: () async {
-                      FocusScope.of(context).unfocus();
-                      await Future.delayed(const Duration(seconds: 3));
-                      Get.to(()=>OTP(isFromSignUp: false,));
-                    },
-                  ),
-                  SizedBox(height: 50.h),
-                ],
-              ),
+                );
+              },
             ),
           ),
         );

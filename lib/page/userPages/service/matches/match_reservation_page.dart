@@ -1,7 +1,6 @@
 import 'package:maydan/widgets/my_library.dart';
 
 import '../../../../widgets/booking_success_dialog.dart';
-import '../../main_User.dart';
 
 class MatchReservationPage extends StatelessWidget {
   final dynamic matchId; // ممكن int أو String حسب بياناتك
@@ -50,6 +49,8 @@ class MatchReservationPage extends StatelessWidget {
             match["type"] ?? "match"; // "match" / "challenge" / "activity"
         final String imageName =
             match[newBooking ? "image" : "photo"] ?? "stadiumImg";
+        final String imageUrl =
+            match[newBooking ? "imageUrl" : "photoUrl"] ?? "";
         final Object price = match["price"] ?? 0;
 
         return GestureDetector(
@@ -69,6 +70,7 @@ class MatchReservationPage extends StatelessWidget {
                       matchDate: matchDate,
                       matchTypeKey: matchTypeKey,
                       imageName: imageName,
+                      imageUrl: imageUrl,
                     ),
                     SizedBox(height: 24.h),
                     Padding(
@@ -251,6 +253,7 @@ class MatchReservationPage extends StatelessWidget {
     required String matchDate,
     required String matchTypeKey,
     required String imageName,
+    required String imageUrl,
   }) {
     return Container(
       height: 260.h,
@@ -262,10 +265,15 @@ class MatchReservationPage extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: CustomPngImage(
-              imageName: imageName,
-              boxFit: BoxFit.cover,
-            ),
+            child: imageUrl.isNotEmpty
+                ? CustomPngImageNetwork(
+                    imageUrl: imageUrl,
+                    boxFit: BoxFit.cover,
+                  )
+                : CustomPngImage(
+                    imageName: imageName,
+                    boxFit: BoxFit.cover,
+                  ),
           ),
           Positioned.fill(
             child: Container(
@@ -622,7 +630,7 @@ class MatchReservationPage extends StatelessWidget {
   // ================= BOTTOM BAR ================= //
 
   Widget _buildBottomBar(
-      {required String price, required Map<String, String> matchSelect}) {
+      {required String price, required Map<String, dynamic> matchSelect}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
