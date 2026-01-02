@@ -1,7 +1,7 @@
 import 'package:maydan/widgets/my_library.dart';
 
 class SportsTabs extends StatelessWidget {
-  final List<Map<String, String>> items;
+  final List<Map<String, dynamic>> items;
   final int selectedIndex;
   final ValueChanged<int> onTap;
 
@@ -20,14 +20,17 @@ class SportsTabs extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: items.length,
         separatorBuilder: (_, __) => SizedBox(width: 12.w),
-        itemBuilder: (context, index) {
-          final item = items[index];
-          final bool selected = selectedIndex == index;
+      itemBuilder: (context, index) {
+        final item = items[index];
+        final bool selected = selectedIndex == index;
+        final title = (item["name"] ?? item["key"] ?? "").toString();
+        final imageName = (item["image"] ?? "").toString();
+        final imageUrl = (item["imageUrl"] ?? "").toString();
 
-          return GestureDetector(
-            onTap: () => onTap(index),
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
+        return GestureDetector(
+          onTap: () => onTap(index),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
               decoration: BoxDecoration(
                 color:
                 selected ? AppColors.green : Colors.white.withOpacity(0.08),
@@ -37,18 +40,26 @@ class SportsTabs extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   CustomText(
-                    item["key"]!.tr,
+                    item["key"] != null ? item["key"]!.toString().tr : title,
                     fontSize: 16.sp,
                     color: selected ? Colors.black : Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                   SizedBox(width: 10.w),
-                  CustomPngImage(
-                    imageName: item["image"]!,
-                    width: 35.w,
-                    height: 35.w,
-                    boxFit: BoxFit.contain,
-                  ),
+                  if (imageUrl.isNotEmpty)
+                    CustomPngImageNetwork(
+                      imageUrl: imageUrl,
+                      width: 30.w,
+                      height: 30.w,
+                      boxFit: BoxFit.cover,
+                    )
+                  else if (imageName.isNotEmpty)
+                    CustomPngImage(
+                      imageName: imageName,
+                      width: 30.w,
+                      height: 30.w,
+                      boxFit: BoxFit.contain,
+                    ),
                 ],
               ),
             ),

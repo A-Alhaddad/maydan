@@ -44,6 +44,12 @@ class ServiceSearchCoach extends StatelessWidget {
             itemCount: AppGet.to.coaches.length,
             itemBuilder: (context, index) {
               final item = AppGet.to.coaches[index];
+              final imageUrl = item['imageUrl'] ?? '';
+              final ImageProvider<Object> avatar =
+                  imageUrl.toString().isNotEmpty
+                      ? NetworkImage(imageUrl) as ImageProvider<Object>
+                      : AssetImage("assets/images/${item['image']}.png")
+                          as ImageProvider<Object>;
               return GestureDetector(
                 onTap: () {
                   Get.to(
@@ -60,25 +66,23 @@ class ServiceSearchCoach extends StatelessWidget {
                     color: Colors.white.withOpacity(0.09),
                     borderRadius: BorderRadius.circular(26.r),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 90.h,
-                        width: 100.w,
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.darkIndigo),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.only(start: 5.w,end: 10.w),
-                          child: CircleAvatar(
-                            radius: 35.r,
-                            backgroundImage: AssetImage(
-                              "assets/images/${item['image']}.png",
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 90.h,
+                            width: 100.w,
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColors.darkIndigo),
+                            child: Padding(
+                              padding: EdgeInsetsDirectional.only(start: 5.w,end: 10.w),
+                              child: CircleAvatar(
+                                radius: 35.r,
+                                backgroundImage: avatar,
+                              ),
                             ),
                           ),
-                        ),
-                      ),
                       SizedBox(width: 14.w),
                       Expanded(
                         child: Column(

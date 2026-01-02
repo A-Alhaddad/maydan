@@ -16,6 +16,10 @@ class CoachDetailsPage extends StatelessWidget {
     final String description = coach["description"] ?? "مدرب كرة قدم معتمد بخبرة تفوق 8 سنوات في تدريب اللاعبين من مختلف الأعمار والمستويات.\n\nأخصص برامج تدريبية فردية وجماعية تركّز على تطوير اللياقة البدنية، الفهم التكتيكي، والجاهزية الذهنية داخل الملعب. اشتغلت مع فرق أحياء ومراكز رياضية، وأؤمن أن كل لاعب لديه فرصة حقيقية للتطور إذا حصل على التوجيه المناسب.\n\nإذا كنت تبحث عن تدريب جاد وممتع، احجز جلستك معي وابدأ رحلتك نحو مستوى أعلى.";
     final String rating = coach["rate"]?.toString() ?? "";
     final String image = coach["image"] ?? "coach_1";
+    final String imageUrl = coach["imageUrl"] ?? "";
+    final ImageProvider<Object> avatar = imageUrl.isNotEmpty
+        ? NetworkImage(imageUrl) as ImageProvider<Object>
+        : AssetImage("assets/images/$image.png") as ImageProvider<Object>;
 
     return GetBuilder<AppGet>(
       id: 'CoachDetailsPage',
@@ -37,8 +41,7 @@ class CoachDetailsPage extends StatelessWidget {
                   SizedBox(height: 12.h),
                   CircleAvatar(
                     radius: 55.r,
-                    backgroundImage:
-                    AssetImage("assets/images/$image.png"),
+                    backgroundImage: avatar,
                   ),
                   SizedBox(height: 14.h),
                   CustomText(

@@ -270,7 +270,8 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _matchCard(Map<String, String> match) {
+  Widget _matchCard(Map<String, dynamic> match) {
+    final photoUrl = match["photoUrl"] ?? "";
     return Container(
       width: 370.w,
       height: 140.h,
@@ -287,10 +288,15 @@ class Home extends StatelessWidget {
             child: SizedBox(
               width: 110.w,
               height: 100.h,
-              child: CustomPngImage(
-                imageName: match["photo"] ?? "",
-                boxFit: BoxFit.fill,
-              ),
+              child: photoUrl.isNotEmpty
+                  ? CustomPngImageNetwork(
+                      imageUrl: photoUrl,
+                      boxFit: BoxFit.cover,
+                    )
+                  : CustomPngImage(
+                      imageName: match["photo"] ?? "",
+                      boxFit: BoxFit.fill,
+                    ),
             ),
           ),
           SizedBox(width: 14.w),
@@ -452,7 +458,8 @@ class Home extends StatelessWidget {
     );
   }
 
-  Widget _stadiumCard(Map<String, String> stadium) {
+  Widget _stadiumCard(Map<String, dynamic> stadium) {
+    final imageUrl = stadium["imageUrl"] ?? "";
     return Container(
       width: 340.w,
       decoration: BoxDecoration(
@@ -466,21 +473,26 @@ class Home extends StatelessWidget {
             height: 190.h,
             width: double.infinity,
             padding: EdgeInsets.only(top: 10.h, right: 10.w, left: 10.w),
-            child: ClipRRect(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(26.r),
-                bottom: Radius.circular(26.r),
-              ),
-              child: SizedBox(
-                height: 190.h,
-                width: double.infinity,
-                child: CustomPngImage(
-                  imageName: stadium["image"] ?? "",
-                  boxFit: BoxFit.cover,
-                ),
-              ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(26.r),
+              bottom: Radius.circular(26.r),
+            ),
+            child: SizedBox(
+              height: 190.h,
+              width: double.infinity,
+              child: imageUrl.isNotEmpty
+                  ? CustomPngImageNetwork(
+                      imageUrl: imageUrl,
+                      boxFit: BoxFit.cover,
+                    )
+                  : CustomPngImage(
+                      imageName: stadium["image"] ?? "",
+                      boxFit: BoxFit.cover,
+                    ),
             ),
           ),
+        ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
             child: Column(
@@ -612,6 +624,11 @@ class Home extends StatelessWidget {
   }
 
   Widget _coachCard(Map coach) {
+    final imageUrl = coach['imageUrl'] ?? '';
+    final ImageProvider<Object> avatar = imageUrl.toString().isNotEmpty
+        ? NetworkImage(imageUrl) as ImageProvider<Object>
+        : AssetImage("assets/images/${coach['image']}.png")
+            as ImageProvider<Object>;
     return Container(
       width: 130.w,
       padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
@@ -626,7 +643,7 @@ class Home extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 35.r,
-            backgroundImage: AssetImage("assets/images/${coach['image']}.png"),
+            backgroundImage: avatar,
           ),
           SizedBox(height: 10.h),
           CustomText(

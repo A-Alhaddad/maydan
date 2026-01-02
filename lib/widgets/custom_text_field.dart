@@ -42,16 +42,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final hasLabel = widget.label.trim().isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CustomText(
-          widget.label.tr,
-          fontSize: 15.sp,
-          color: Colors.white,
-          fontWeight: FontWeight.w400,
-        ),
-        SizedBox(height: 8.h),
+        if (hasLabel) ...[
+          CustomText(
+            widget.label.tr,
+            fontSize: 15.sp,
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
+          SizedBox(height: 8.h),
+        ],
         Focus(
           onFocusChange: (f) {
             setState(() {

@@ -1,8 +1,5 @@
 import 'package:maydan/widgets/my_library.dart';
 
-import '../../../../widgets/booking_success_dialog.dart';
-import '../../main_User.dart';
-
 class ActivityDetailsPage extends StatelessWidget {
   final dynamic matchId;
 
@@ -40,6 +37,7 @@ class ActivityDetailsPage extends StatelessWidget {
         final String matchTypeKey =
             match["type"] ?? "match"; // "match" / "challenge" / "activity"
         final String imageName = match["photo"] ?? "stadiumImg";
+        final String imageUrl = match["photoUrl"] ?? "";
         final Object price = match["price"] ?? 0;
 
         return GestureDetector(
@@ -51,14 +49,17 @@ class ActivityDetailsPage extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 0.w),
               child: Column(
                 children: [
-                  _buildTopCard(
-                    activityName: 'اسم النشاط',
-                    stadiumLocation: stadiumLoc,
-                    matchTime: matchTime,
-                    matchDate: '7 إلى 10 نوفمبر',
-                    matchTypeKey: matchTypeKey,
-                    imageName: imageName,
-                  ),
+                    _buildTopCard(
+                      activityName: stadiumName.isNotEmpty
+                          ? stadiumName
+                          : 'نشاط رياضي',
+                      stadiumLocation: stadiumLoc,
+                      matchTime: matchTime,
+                      matchDate: matchDate,
+                      matchTypeKey: matchTypeKey,
+                      imageName: imageName,
+                      imageUrl: imageUrl,
+                    ),
                   SizedBox(height: 24.h),
                   Expanded(
                     child: Padding(
@@ -111,6 +112,7 @@ class ActivityDetailsPage extends StatelessWidget {
     required String matchDate,
     required String matchTypeKey,
     required String imageName,
+    required String imageUrl,
   }) {
     return Container(
       height: 260.h,
@@ -122,10 +124,15 @@ class ActivityDetailsPage extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: CustomPngImage(
-              imageName: imageName,
-              boxFit: BoxFit.cover,
-            ),
+            child: imageUrl.isNotEmpty
+                ? CustomPngImageNetwork(
+                    imageUrl: imageUrl,
+                    boxFit: BoxFit.cover,
+                  )
+                : CustomPngImage(
+                    imageName: imageName,
+                    boxFit: BoxFit.cover,
+                  ),
           ),
           Positioned.fill(
             child: Container(
@@ -326,7 +333,7 @@ class ActivityDetailsPage extends StatelessWidget {
   // ================= BOTTOM BAR ================= //
 
   Widget _buildBottomBar(
-      {required String price, required Map<String, String> matchSelect}) {
+      {required String price, required Map<String, dynamic> matchSelect}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
