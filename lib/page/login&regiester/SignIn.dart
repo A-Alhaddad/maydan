@@ -7,13 +7,12 @@ class SignIn extends StatelessWidget {
   SignIn({super.key});
 
   final TextEditingController phoneCtrl = TextEditingController();
-  final TextEditingController passCtrl = TextEditingController();
+  // final TextEditingController passCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
       id: 'SignIn',
-      init: AppGet(),
       builder: (controller) {
         return GestureDetector(
           onTap: () {
@@ -35,7 +34,7 @@ class SignIn extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     textAlign: TextAlign.start,
                   ),
-                  SizedBox(height: 40.h),
+                  SizedBox(height: 50.h),
                   CustomTextField(
                     label: "phoneNumber",
                     hint: "enterPhone",
@@ -47,30 +46,30 @@ class SignIn extends StatelessWidget {
                       size: 22.sp,
                     ),
                   ),
-                  SizedBox(height: 25.h),
-                  CustomTextField(
-                    label: "password",
-                    hint: "enterPassword",
-                    controller: passCtrl,
-                    isPassword: true,
-                  ),
-                  SizedBox(height: 12.h),
-                  GestureDetector(
-                    onTap: () {
-                      FocusScope.of(context).unfocus();
-                      Get.to(() => ForgetPassword());
-                    },
-                    child: Align(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: CustomText(
-                        "forgetPassword".tr,
-                        color: AppColors.green,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        textAlign: TextAlign.end,
-                      ),
-                    ),
-                  ),
+                  // SizedBox(height: 25.h),
+                  // CustomTextField(
+                  //   label: "password",
+                  //   hint: "enterPassword",
+                  //   controller: passCtrl,
+                  //   isPassword: true,
+                  // ),
+                  // SizedBox(height: 12.h),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     FocusScope.of(context).unfocus();
+                  //     Get.to(() => ForgetPassword());
+                  //   },
+                  //   child: Align(
+                  //     alignment: AlignmentDirectional.centerEnd,
+                  //     child: CustomText(
+                  //       "forgetPassword".tr,
+                  //       color: AppColors.green,
+                  //       fontSize: 14.sp,
+                  //       fontWeight: FontWeight.w600,
+                  //       textAlign: TextAlign.end,
+                  //     ),
+                  //   ),
+                  // ),
                   const Spacer(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -103,7 +102,7 @@ class SignIn extends StatelessWidget {
                       await Future.delayed(const Duration(seconds: 3));
                       controller.afterLoginOrRegister(
                           fromLogin: true,
-                          password: passCtrl.text,
+                          // password: passCtrl.text,
                           userName: phoneCtrl.text);
                     },
                   ),

@@ -1,10 +1,10 @@
 import 'package:maydan/widgets/my_library.dart';
 
-class MainUserScreen extends StatelessWidget {
+class MainManagerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
-      id: 'MainUserScreen',
+      id: 'MainManagerScreen',
       builder: (controller) {
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -33,12 +33,18 @@ class MainUserScreen extends StatelessWidget {
   Widget _buildBottomNav(AppGet controller) {
     final items = [
       "icon10",
-      "icon11",
+      "icon22",
+      "icon23",
       "icon12",
     ];
-
+    final itemsSelect = [
+      "icon100",
+      "icon26",
+      "icon27",
+      "icon120",
+    ];
     return Container(
-      width: 260.w,
+      width: 320.w,
       height: 70.h,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(40.r),
@@ -55,7 +61,7 @@ class MainUserScreen extends StatelessWidget {
           final bool selected = controller.bottomNavIndex == index;
 
           return GestureDetector(
-            onTap: () => controller.changeBottomNavUser(indexBottomNav: index ),
+            onTap: () => controller.changeBottomNavUser(indexBottomNav: index),
             child: Container(
               width: 60.w,
               height: 60.w,
@@ -66,12 +72,9 @@ class MainUserScreen extends StatelessWidget {
               ),
               child: Center(
                 child: CustomSvgImage(
-                  imageName:  selected
-                      ? '${items[index]}0'
-                      : items[index],
+                  imageName: selected ? '${itemsSelect[index]}' : items[index],
                   width: 26.w,
-                  height: index == 1 ? 18.w : index == 2 ? 30.w:26.w,
-
+                  height: index == 2 ? 30.w : 26.w,
                 ),
               ),
             ),

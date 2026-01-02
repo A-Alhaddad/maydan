@@ -11,7 +11,6 @@ class TextScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
         id: 'TextScreen',
-        init: AppGet(),
         builder: (controller) {
           return Scaffold(
             backgroundColor: Colors.transparent,

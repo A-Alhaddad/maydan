@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+import 'package:maydan/services/networkMonitor.dart';
 import 'package:maydan/splash.dart';
 import 'package:maydan/widgets/my_library.dart';
 
@@ -26,6 +28,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<AppGet>();
+
     return ScreenUtilInit(
       designSize: const Size(450, 844),
       minTextAdapt: true,
@@ -48,9 +52,11 @@ class _MyAppState extends State<MyApp> {
                   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                   child: widget!,
                 ),
+
               ],
             );
           },
+
           locale: Locale(
             AppPreferences().getLanguageCode,
             AppPreferences().getCountryCode,

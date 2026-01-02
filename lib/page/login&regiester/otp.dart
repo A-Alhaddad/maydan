@@ -19,7 +19,6 @@ class _OTPState extends State<OTP> {
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
       id: 'OTP',
-      init: AppGet(),
       builder: (controller) {
         return GestureDetector(
           onTap: () {

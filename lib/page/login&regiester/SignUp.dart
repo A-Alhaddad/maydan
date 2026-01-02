@@ -13,7 +13,6 @@ class SignUp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
       id: 'SignUp',
-      init: AppGet(),
       builder: (controller) {
         return GestureDetector(
           onTap: () {

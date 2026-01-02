@@ -14,7 +14,7 @@ class Home extends StatelessWidget {
     return GetBuilder<AppGet>(
       id: 'Home',
       builder: (controller) {
-        if (controller.isHomeUserLoading) {
+        if (controller.isHomeLoading) {
           return const HomeShimmer();
         }
         return GestureDetector(

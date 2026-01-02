@@ -10,7 +10,6 @@ class ForgetPassword extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
       id: 'ForgetPassword',
-      init: AppGet(),
       builder: (controller) {
         return GestureDetector(
           onTap: () {

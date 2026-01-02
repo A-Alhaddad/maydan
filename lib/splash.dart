@@ -16,6 +16,8 @@ class _SplashState extends State<Splash> {
   AppGet appGet = Get.find();
   @override
   void initState() {
+    AppGet.to.getInitDataFromServer();
+
     var delay = Duration(seconds: 3);
     Future.delayed(delay, () async {
       nextScreen();
