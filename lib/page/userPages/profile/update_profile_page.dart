@@ -220,7 +220,9 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                             });
                           },
                         ),
-                        SizedBox(height: 20.h,)
+                        SizedBox(
+                          height: 20.h,
+                        )
                       ],
                     ),
                   ),
@@ -243,10 +245,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
   Future<void> _saveProfile() async {
     final controller = AppGet.to;
-    final originalMobile = controller.userMobile ?? '';
-    final originalDial = controller.selectedDialCode;
-    final originalFormattedMobile = _formatMobile(
-        _stripDialCode(originalMobile, originalDial), originalDial);
+    final sessionMobile = controller.userMobile ?? '';
     final formattedMobile =
         _formatMobile(phoneCtrl.text.trim(), _localDialCode);
     printLog('formattedMobile ${formattedMobile.toString()}');
@@ -258,14 +257,14 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       cityId: _localCityId,
       locale: selectedLocale,
       imageFile: _pickedImage,
-    ); 
+    );
     final ok = result['success'] == true;
     final mobileForOtp = result['mobileForOtp']?.toString();
 
     if (!ok) return;
     // إذا احتاج تحقق OTP نبقى في الصفحة ونظهر نافذة إدخال الرمز
     if (mobileForOtp != null && mobileForOtp.isNotEmpty) {
-      _showOtpDialog(originalFormattedMobile);
+      _showOtpDialog(sessionMobile);
       return;
     }
 
@@ -830,11 +829,17 @@ class _LanguageSelector extends StatelessWidget {
               items: const [
                 DropdownMenuItem(
                   value: 'ar',
-                  child: CustomText('العربية',color: Colors.white,) ,
+                  child: CustomText(
+                    'العربية',
+                    color: Colors.white,
+                  ),
                 ),
                 DropdownMenuItem(
                   value: 'en',
-                  child: CustomText('English',color: Colors.white,) ,
+                  child: CustomText(
+                    'English',
+                    color: Colors.white,
+                  ),
                 ),
               ],
               onChanged: (val) {
