@@ -220,6 +220,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                             });
                           },
                         ),
+                        SizedBox(height: 20.h,)
                       ],
                     ),
                   ),
@@ -248,6 +249,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
         _stripDialCode(originalMobile, originalDial), originalDial);
     final formattedMobile =
         _formatMobile(phoneCtrl.text.trim(), _localDialCode);
+    printLog('formattedMobile ${formattedMobile.toString()}');
     final result = await controller.updateProfileOnServer(
       name: nameCtrl.text.trim(),
       email: emailCtrl.text.trim(),
@@ -256,12 +258,11 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       cityId: _localCityId,
       locale: selectedLocale,
       imageFile: _pickedImage,
-    );
+    ); 
     final ok = result['success'] == true;
     final mobileForOtp = result['mobileForOtp']?.toString();
 
     if (!ok) return;
-
     // إذا احتاج تحقق OTP نبقى في الصفحة ونظهر نافذة إدخال الرمز
     if (mobileForOtp != null && mobileForOtp.isNotEmpty) {
       _showOtpDialog(originalFormattedMobile);
@@ -554,14 +555,14 @@ class _CountryDialSelector extends StatelessWidget {
           }
         }
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+          padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 6.h),
           height: 54.h,
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.08),
             borderRadius: BorderRadius.circular(26.r),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.12),
-            ),
+            // border: Border.all(
+            //   color: Colors.white.withOpacity(0.12),
+            // ),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -665,13 +666,14 @@ class _CountrySelector extends StatelessWidget {
             currentId != null && items.any((c) => c['id'] == currentId);
         if (!hasValue) currentId = null;
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 4.h),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(18.r),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.12),
-            ),
+            borderRadius: BorderRadius.circular(25.r),
+            // border: Border.all(
+            //   color: Colors.white.withOpacity(0.12),
+            // ),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -695,12 +697,12 @@ class _CountrySelector extends StatelessWidget {
                             color: Colors.white,
                             fontSize: 14.sp,
                           ),
-                          SizedBox(width: 8.w),
-                          CustomText(
-                            c['dialCode'],
-                            color: Colors.white.withOpacity(0.6),
-                            fontSize: 12.sp,
-                          ),
+                          // SizedBox(width: 8.w),
+                          // CustomText(
+                          //   c['dialCode'],
+                          //   color: Colors.white.withOpacity(0.6),
+                          //   fontSize: 12.sp,
+                          // ),
                         ],
                       ),
                     ),
@@ -745,13 +747,11 @@ class _CitySelector extends StatelessWidget {
         final hasValue =
             currentId != null && cities.any((c) => c['id'] == currentId);
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 4.h),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(18.r),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.12),
-            ),
+            borderRadius: BorderRadius.circular(25.r),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -813,13 +813,14 @@ class _LanguageSelector extends StatelessWidget {
         ),
         SizedBox(height: 10.h),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(18.r),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.12),
-            ),
+            borderRadius: BorderRadius.circular(25.r),
+            // border: Border.all(
+            //   color: Colors.white.withOpacity(0.12),
+            // ),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -829,11 +830,11 @@ class _LanguageSelector extends StatelessWidget {
               items: const [
                 DropdownMenuItem(
                   value: 'ar',
-                  child: Text('العربية'),
+                  child: CustomText('العربية',color: Colors.white,) ,
                 ),
                 DropdownMenuItem(
                   value: 'en',
-                  child: Text('English'),
+                  child: CustomText('English',color: Colors.white,) ,
                 ),
               ],
               onChanged: (val) {

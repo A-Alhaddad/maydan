@@ -31,7 +31,7 @@ class AppGet extends GetxController {
   int selectedServiceIndex = 0;
   int selectedSportTapIndex = 0;
   int selectedMatchTypeIndex = 0;
-  String urlWebApp = 'http://192.168.0.3/maydan/index.php';
+  String urlWebApp = 'https://maydan.alruqeishi-group.com';
   Widget? widgetHome;
   bool isHomeUserLoading = true;
   List<Map<String, dynamic>> sportsList = [];
@@ -471,6 +471,7 @@ class AppGet extends GetxController {
       );
       return;
     }
+    printLog('${res.data}');
     Get.to(() => OTP(
           isFromSignUp: false,
           phone: mobile,
@@ -522,7 +523,6 @@ class AppGet extends GetxController {
       );
       return;
     }
-
     Get.to(() => OTP(isFromSignUp: true, phone: mobile));
   }
 
@@ -881,8 +881,8 @@ class AppGet extends GetxController {
     if (res.data is Map<String, dynamic>) {
       final map = res.data as Map<String, dynamic>;
       mobileForOtp = map['mobile']?.toString();
+      printLog(map.toString());
     }
-
     return {
       'success': true,
       'mobileForOtp': mobileForOtp,
