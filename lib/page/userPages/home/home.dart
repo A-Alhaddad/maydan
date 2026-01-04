@@ -35,7 +35,7 @@ class Home extends StatelessWidget {
                 SliverToBoxAdapter(child: SizedBox(height: 24.h)),
                 SliverToBoxAdapter(child: _buildLastMatchCard()),
                 SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-                SliverPersistentHeader( 
+                SliverPersistentHeader(
                   pinned: true,
                   delegate: _SportsHeaderDelegate(
                     minExtent: 100.h,
