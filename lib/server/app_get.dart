@@ -1086,6 +1086,7 @@ class AppGet extends GetxController {
       final resolvedCoaches =
           _withFallback(_mapCoaches(trainersRes.data), _fallbackCoaches);
 
+      // printLog(resolvedStadiums);
       _matchesCache[cacheKey] = resolvedMatches;
       _stadiumsCache[cacheKey] = resolvedStadiums;
       _coachesCache[cacheKey] = resolvedCoaches;

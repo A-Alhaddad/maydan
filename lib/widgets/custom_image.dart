@@ -30,9 +30,10 @@ class CustomPngImageNetwork extends StatelessWidget {
   final double? width;
   final BoxFit? boxFit;
   final Color? color;
+  final Widget? widgetError;
 
   CustomPngImageNetwork(
-      {this.imageUrl, this.height, this.width, this.boxFit, this.color});
+      {this.imageUrl, this.height, this.width, this.boxFit, this.color, this.widgetError});
   @override
   Widget build(BuildContext context) {
     return Image.network(
@@ -42,6 +43,13 @@ class CustomPngImageNetwork extends StatelessWidget {
       width: width ?? 30.w,
       fit: boxFit ?? BoxFit.contain,
       isAntiAlias: true,
+
+      errorBuilder: (context, error, stackTrace) {
+        return widgetError ?? CustomPngImage(
+          imageName: 'logoWithBackground',
+          boxFit: BoxFit.fill,
+        );
+      },
     );
   }
 }
