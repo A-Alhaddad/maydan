@@ -5,7 +5,6 @@ class empty extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
         id: 'nameClass',
-        init: AppGet(),
         builder: (controller) {
           return Scaffold(
             backgroundColor: Colors.transparent,

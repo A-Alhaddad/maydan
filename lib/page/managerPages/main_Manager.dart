@@ -1,34 +1,28 @@
 import 'package:maydan/widgets/my_library.dart';
 
-class MainUserScreen extends StatelessWidget {
+class MainManagerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
-      id: 'MainUserScreen',
+      id: 'MainManagerScreen',
       builder: (controller) {
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
-            backgroundColor: Colors.transparent,
+            backgroundColor: Colors.black.withOpacity(0.001),
             resizeToAvoidBottomInset: false,
-            body: Stack(
-              children: [
-                Positioned.fill(
-                  child: Padding(
-                    padding:
-                        EdgeInsets.only(left: 10.w, right: 10.w, top: 40.h),
+            body: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: Column(
+                children: [
+                  Expanded(
                     child: controller.widgetHome!,
                   ),
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 24.h,
-                  child: Center(
-                    child: _buildBottomNav(controller),
-                  ),
-                ),
-              ],
+                  SizedBox(height: 8.h),
+                  _buildBottomNav(controller),
+                  SizedBox(height: 35.h),
+                ],
+              ),
             ),
           ),
         );
@@ -39,22 +33,28 @@ class MainUserScreen extends StatelessWidget {
   Widget _buildBottomNav(AppGet controller) {
     final items = [
       "icon10",
-      "icon11",
+      "icon22",
+      "icon23",
       "icon12",
     ];
-
+    final itemsSelect = [
+      "icon100",
+      "icon26",
+      "icon27",
+      "icon120",
+    ];
     return Container(
-      width: 260.w,
-      height: 80.h,
+      width: 320.w,
+      height: 70.h,
       decoration: BoxDecoration(
-        color: AppColors.darkIndigo.withOpacity(0.9),
         borderRadius: BorderRadius.circular(40.r),
+        color: Colors.white.withOpacity(0.03),
         border: Border.all(
-          color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withOpacity(0.18),
           width: 1,
         ),
       ),
-      padding: EdgeInsets.symmetric(vertical: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 10.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(items.length, (index) {
@@ -72,13 +72,9 @@ class MainUserScreen extends StatelessWidget {
               ),
               child: Center(
                 child: CustomSvgImage(
-                  imageName: selected ? '${items[index]}0' : items[index],
+                  imageName: selected ? '${itemsSelect[index]}' : items[index],
                   width: 26.w,
-                  height: index == 1
-                      ? 18.w
-                      : index == 2
-                          ? 30.w
-                          : 26.w,
+                  height: index == 2 ? 30.w : 26.w,
                 ),
               ),
             ),

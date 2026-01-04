@@ -21,8 +21,7 @@ class AuthServer {
   /////////////////////////Login///////////////////////
 
   Future<dynamic> loginUser({
-    required String email,
-    required String password,
+    required String mobile,
   }) async {
     try {
       initDio();
@@ -36,8 +35,7 @@ class AuthServer {
       };
       // print('=====>fcm $fcm');
       var formData = FormData.fromMap({
-        'email': email.toString().trim(),
-        'password': password,
+        'mobile': mobile,
         // "fcm_token": fcm
       });
 

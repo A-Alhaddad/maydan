@@ -8,7 +8,6 @@ class ActivityDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
-      init: AppGet(),
       id: 'MatchReservationPage',
       builder: (controller) {
         final match = controller.matches.firstWhere(

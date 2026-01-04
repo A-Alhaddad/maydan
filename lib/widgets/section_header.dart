@@ -6,6 +6,7 @@ class SectionHeader extends StatelessWidget {
   final bool showMore;
   final String? moreText;
   final VoidCallback? onMoreTap;
+  final Widget? widgetInSection;
 
   const SectionHeader({
     super.key,
@@ -14,6 +15,7 @@ class SectionHeader extends StatelessWidget {
     this.showMore = false,
     this.moreText,
     this.onMoreTap,
+    this.widgetInSection,
   });
 
   @override
@@ -24,18 +26,21 @@ class SectionHeader extends StatelessWidget {
           imageName: iconName,
           height: 27.h,
         ),
-
         SizedBox(width: 10.w),
-
         Expanded(
-          child: CustomText(
-            title,
-            fontSize: 16.sp,
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
+          child: Row(
+            children: [
+              CustomText(
+                title,
+                fontSize: 16.sp,
+                color: Colors.white,
+                fontWeight: FontWeight.w400,
+              ),
+              if (widgetInSection != null) widgetInSection! ,
+
+            ],
           ),
         ),
-
         if (showMore)
           GestureDetector(
             onTap: onMoreTap,

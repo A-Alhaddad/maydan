@@ -9,6 +9,7 @@ import 'package:maydan/server/api_repository.dart';
 import 'package:maydan/page/login&regiester/otp.dart';
 
 import '../page/generalPage/notification_page.dart';
+import '../page/managerPages/orders/ordersManagement.dart';
 import '../page/userPages/home/home.dart';
 import '../page/userPages/profile/profile.dart';
 import '../page/userPages/service/bodyService/service_main_content.dart';
@@ -212,6 +213,16 @@ class AppGet extends GetxController {
     },
   ];
 
+  final List<Map<String, dynamic>> topProducts = [
+    {
+      "title": "شبك ملاعب كرة قدم",
+      "price": 48,
+      "currencyKey": "matchReservationCurrency",
+      "leftImage": "ball1",
+      "rightImage": "ball1",
+    }
+  ];
+
   final leftSlots = [
     {"name": "محمد", "image": "ball22.png", "indexPlayer": "L1"},
     {"name": "عبدالله", "image": "coach_4.png", "indexPlayer": "L2"},
@@ -252,6 +263,97 @@ class AppGet extends GetxController {
     },
   ];
 
+  List<Map<String, dynamic>> addedItemsProducts = [
+    {
+      "id": 1,
+      "title": "شبك ملعب كرة قدم",
+      "desc": "إذا كنت تحتاج إلى عدد أكبر من الفقرات …",
+      "price": "48",
+      "currencyKey": "matchReservationCurrency",
+      "image": "ball_net",
+      "showLeftPlus": false,
+    },
+  ];
+
+  List<Map<String, dynamic>> addedItemsService = [
+    {
+      "id": 1,
+      "title": "شبك ملعب كرة قدم",
+      "desc": "إذا كنت تحتاج إلى عدد أكبر من الفقرات …",
+      "price": "48",
+      "currencyKey": "matchReservationCurrency",
+      "image": "ball_net",
+      "showLeftPlus": false,
+    },
+  ];
+  final List<OrderModel> newOrders = [
+    OrderModel(
+      title: "proFootball".tr,
+      statusKey: "orderStatusDelivered",
+      statusType: OrderStatusType.green,
+      customer: "محمد أحمد",
+      ballsCount: 4,
+      price: 250,
+      imageName: "football", // assets/images/football.png
+      showMetaRow: false,
+    ),
+    OrderModel(
+      title: "proFootball".tr,
+      statusKey: "orderStatusDelivered",
+      statusType: OrderStatusType.green,
+      customer: "محمود حسن",
+      ballsCount: 2,
+      price: 250,
+      imageName: "football",
+      showMetaRow: false,
+    ),
+  ];
+
+  final List<OrderModel> preOrders = [
+    OrderModel(
+      title: "proBasketball".tr,
+      statusKey: "orderStatusShipping",
+      statusType: OrderStatusType.red,
+      customer: "محمد أحمد",
+      ballsCount: 4,
+      price: 250,
+      imageName: "basketball",
+      showMetaRow: false,
+    ),
+    OrderModel(
+      title: "proBasketball".tr,
+      statusKey: "orderStatusShipping",
+      statusType: OrderStatusType.red,
+      customer: "سعيد المنسي",
+      ballsCount: 10,
+      price: 250,
+      imageName: "basketball",
+      showMetaRow: false,
+    ),
+  ];
+
+  final List<OrderModel> otherOrders = [
+    OrderModel(
+      title: "proFootball".tr,
+      customer: "محمد أحمد",
+      ballsCount: 4,
+      price: 250,
+      imageName: "football",
+      showMetaRow: true,
+      timeRange: "22:30 - 21:00",
+      dateText: "10 / 7",
+    ),
+    OrderModel(
+      title: "proBasketball".tr,
+      customer: "سعيد المنسي",
+      ballsCount: 10,
+      price: 250,
+      imageName: "basketball",
+      showMetaRow: true,
+      timeRange: "22:30 - 21:00",
+      dateText: "10 / 7",
+    ),
+  ];
   //////////////////// Functions ///////////////////////////
 
   updateScreen({required List<String> nameScreen}) {
@@ -1325,4 +1427,23 @@ class AppGet extends GetxController {
         selectedDialCode.isNotEmpty ? selectedDialCode.replaceAll('+', '') : '';
     return '+$dial$cleaned';
   }
+
+
+  int addedItemsTabIndex = 0;
+  int addedItemsCategoryIndex = 0;
+
+  List<Map<String, dynamic>> addedItemsCategories = [
+    {"key": "addedCatMaintenance", "icon": Icons.build_outlined},
+    {"key": "addedCatFootball", "icon": Icons.sports_soccer},
+  ];
+  void changeAddedItemsTab(int i) {
+    addedItemsTabIndex = i;
+    update(['AddedItemsPage']);
+  }
+  void changeAddedItemsCategory(int i) {
+    addedItemsCategoryIndex = i;
+    update(['AddedItemsPage']);
+  }
+  void openEditProduct(dynamic id) {}
+  void openProductDetails(dynamic id) {}
 }

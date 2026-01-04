@@ -10,7 +10,6 @@ class ChangePassword extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<AppGet>(
       id: 'ChangePassword',
-      init: AppGet(),
       builder: (controller) {
         final pass1 = pass1Ctrl.text;
         final pass2 = pass2Ctrl.text;

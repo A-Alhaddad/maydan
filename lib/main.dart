@@ -27,6 +27,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<AppGet>();
+
     return ScreenUtilInit(
       // Close to common Android portrait logical size (Pixel 9 Pro ~411dp width)
       designSize: const Size(411, 915),
