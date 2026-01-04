@@ -10,20 +10,26 @@ class MainUserScreen extends StatelessWidget {
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
-            backgroundColor: Colors.black.withOpacity(0.001),
+            backgroundColor: Colors.transparent,
             resizeToAvoidBottomInset: false,
-            body: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Column(
-                children: [
-                  Expanded(
+            body: Stack(
+              children: [
+                Positioned.fill(
+                  child: Padding(
+                    padding:
+                        EdgeInsets.only(left: 10.w, right: 10.w, top: 40.h),
                     child: controller.widgetHome!,
                   ),
-                  SizedBox(height: 8.h),
-                  _buildBottomNav(controller),
-                  SizedBox(height: 35.h),
-                ],
-              ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 24.h,
+                  child: Center(
+                    child: _buildBottomNav(controller),
+                  ),
+                ),
+              ],
             ),
           ),
         );
@@ -40,23 +46,23 @@ class MainUserScreen extends StatelessWidget {
 
     return Container(
       width: 260.w,
-      height: 70.h,
+      height: 80.h,
       decoration: BoxDecoration(
+        color: AppColors.darkIndigo.withOpacity(0.9),
         borderRadius: BorderRadius.circular(40.r),
-        color: Colors.white.withOpacity(0.03),
         border: Border.all(
-          color: Colors.white.withOpacity(0.18),
+          color: Colors.white.withOpacity(0.1),
           width: 1,
         ),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      padding: EdgeInsets.symmetric(vertical: 10.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(items.length, (index) {
           final bool selected = controller.bottomNavIndex == index;
 
           return GestureDetector(
-            onTap: () => controller.changeBottomNavUser(indexBottomNav: index ),
+            onTap: () => controller.changeBottomNavUser(indexBottomNav: index),
             child: Container(
               width: 60.w,
               height: 60.w,
@@ -67,12 +73,13 @@ class MainUserScreen extends StatelessWidget {
               ),
               child: Center(
                 child: CustomSvgImage(
-                  imageName:  selected
-                      ? '${items[index]}0'
-                      : items[index],
+                  imageName: selected ? '${items[index]}0' : items[index],
                   width: 26.w,
-                  height: index == 1 ? 18.w : index == 2 ? 30.w:26.w,
-
+                  height: index == 1
+                      ? 18.w
+                      : index == 2
+                          ? 30.w
+                          : 26.w,
                 ),
               ),
             ),

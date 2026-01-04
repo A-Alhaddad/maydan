@@ -1,7 +1,6 @@
 // import 'package:maydan/pages/out_boarding/out_boarding_screen.dart';
 import 'package:maydan/page/login&regiester/SignIn.dart';
-import 'package:maydan/server/auth_server.dart';
-import 'package:maydan/server/server_user.dart';
+import 'package:maydan/page/userPages/main_User.dart';
 import 'package:maydan/widgets/my_library.dart';
 import 'package:maydan/widgets/animation_manger.dart';
 
@@ -44,8 +43,19 @@ class _SplashState extends State<Splash> {
     );
   }
 
-  nextScreen(){
-    Get.off(()=>SignIn());
+  Future<void> nextScreen() async {
+    final bool isLoggedIn = AppPreferences().getStateLogin;
+    final String token = AppPreferences().getTokenUser;
+
+    if (isLoggedIn && token.isNotEmpty) {
+      AppGet.to.apiRepository.api.setAuthToken(token);
+      AppGet.to.changeBottomNavUser(indexBottomNav: 0, indexService: 0);
+      await AppGet.to.fetchUserProfile(silent: true);
+      await AppGet.to.loadHomeData();
+      Get.offAll(() => MainUserScreen());
+    } else {
+      Get.off(() => SignIn());
+    }
   }
 }
 

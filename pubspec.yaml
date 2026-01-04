@@ -22,6 +22,7 @@ dependencies:
   universal_platform: ^1.1.0
   loading_animation_widget: ^1.2.1
   shimmer: ^3.0.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.1

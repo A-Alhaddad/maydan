@@ -1,5 +1,5 @@
-import 'package:maydan/page/login&regiester/SignIn.dart';
 import 'package:maydan/page/userPages/profile/text_screen.dart';
+import 'package:maydan/page/userPages/profile/update_profile_page.dart';
 import 'package:maydan/widgets/my_library.dart';
 
 import '../../../widgets/notification_Button.dart';
@@ -23,39 +23,46 @@ class Profile extends StatelessWidget {
               ),
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 35.r,
-                    backgroundImage: AssetImage('assets/images/coach_1.png'
-                        // controller.userModel?.image ?? "",
-                        ),
+                  GestureDetector(
+                    onTap: () => _openEditProfile(),
+                    child: CircleAvatar(
+                      radius: 35.r,
+                      backgroundImage:
+                          controller.userImageUrl?.isNotEmpty == true
+                              ? NetworkImage(controller.userImageUrl!)
+                              : const AssetImage('assets/images/avatar.png'),
+                    ),
                   ),
                   SizedBox(width: 20.w),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                        "عبدالله الراشد",
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                      SizedBox(height: 4.h),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.edit,
-                            size: 16.sp,
-                            color: AppColors.green,
-                          ),
-                          SizedBox(width: 4.w),
-                          CustomText(
-                            "تعديل البيانات الشخصية",
-                            fontSize: 13.sp,
-                            color: AppColors.green,
-                          ),
-                        ],
-                      )
-                    ],
+                  GestureDetector(
+                    onTap: () => _openEditProfile(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomText(
+                          controller.userName ?? "المستخدم",
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        SizedBox(height: 4.h),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.edit,
+                              size: 16.sp,
+                              color: AppColors.green,
+                            ),
+                            SizedBox(width: 4.w),
+                            CustomText(
+                              "تعديل البيانات الشخصية",
+                              fontSize: 13.sp,
+                              color: AppColors.green,
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                   const Spacer(),
                   NotificationButton(
@@ -116,6 +123,10 @@ class Profile extends StatelessWidget {
     );
   }
 
+  void _openEditProfile() {
+    Get.to(() => UpdateProfilePage());
+  }
+
   // ========= WIDGET FOR MENU ITEMS ========= //
 
   void handleProfileClick({required String key}) {
@@ -144,13 +155,13 @@ class Profile extends StatelessWidget {
         break;
       case "BankCards":
         Get.to(() => CommonListPage(
-          title: "BankCards".tr, // عنوان الشاشة
-          items: AppGet.to.bankCards, // ليست من الكنترولر
-          itemBuilder: (item) => PreviousBookingCard(
-            match: item,
-            typeList: "BankCards",
-          ),
-        ));
+              title: "BankCards".tr, // عنوان الشاشة
+              items: AppGet.to.bankCards, // ليست من الكنترولر
+              itemBuilder: (item) => PreviousBookingCard(
+                match: item,
+                typeList: "BankCards",
+              ),
+            ));
         break;
       case "AboutUs":
         Get.to(() => TextScreen(
@@ -174,7 +185,7 @@ class Profile extends StatelessWidget {
         break;
 
       case "Logout":
-        Get.offAll(SignIn());
+        AppGet.to.logOut();
         break;
 
       default:
@@ -391,56 +402,59 @@ class PreviousBookingCard extends StatelessWidget {
                   ],
                 ),
               )
-            :  typeList == 'BankCards'
-        ? Container(
-      width: double.infinity,
-      height: 100.h,
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.09),
-        borderRadius: BorderRadius.circular(26.r),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 90.h,
-            width: 100.w,
-            decoration: const BoxDecoration(
-                shape: BoxShape.circle, color: AppColors.white),
-            child: Center(child: CustomPngImage(imageName: image, width: 70.w,))
-          ),
-          SizedBox(width: 14.w),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CustomText(
-                  name ?? "",
-                  fontSize: 18.sp,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  textAlign: TextAlign.start,
-                ),
-                SizedBox(height: 10.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    CustomText(
-                      number,
-                      fontSize: 16.sp,
-                      color: AppColors.green,
-                      fontWeight: FontWeight.w600,
+            : typeList == 'BankCards'
+                ? Container(
+                    width: double.infinity,
+                    height: 100.h,
+                    padding: EdgeInsets.all(16.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.09),
+                      borderRadius: BorderRadius.circular(26.r),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    )
-        : Container();
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                            height: 90.h,
+                            width: 100.w,
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle, color: AppColors.white),
+                            child: Center(
+                                child: CustomPngImage(
+                              imageName: image,
+                              width: 70.w,
+                            ))),
+                        SizedBox(width: 14.w),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              CustomText(
+                                name ?? "",
+                                fontSize: 18.sp,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                textAlign: TextAlign.start,
+                              ),
+                              SizedBox(height: 10.h),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  CustomText(
+                                    number,
+                                    fontSize: 16.sp,
+                                    color: AppColors.green,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Container();
   }
 }

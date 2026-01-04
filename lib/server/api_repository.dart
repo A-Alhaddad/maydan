@@ -9,6 +9,8 @@ class ApiRepository {
   Future<ApiResult<Map<String, dynamic>>> register({
     required String mobile,
     String role = 'player',
+    String? name,
+    String? countryId,
   }) {
     return api.request<Map<String, dynamic>>(
       path: '/auth/register',
@@ -16,6 +18,8 @@ class ApiRepository {
       data: {
         'mobile': mobile,
         'role': role,
+        if (name != null && name.isNotEmpty) 'name': name,
+        if (countryId != null && countryId.isNotEmpty) 'country_id': countryId,
       },
       decoder: _asMap,
     );
@@ -58,6 +62,15 @@ class ApiRepository {
     );
   }
 
+  Future<ApiResult<Map<String, dynamic>>> getProfile() {
+    return api.request<Map<String, dynamic>>(
+      path: '/profile',
+      method: 'GET',
+      auth: true,
+      decoder: _asMap,
+    );
+  }
+
   Future<ApiResult<List<dynamic>>> getSports() {
     return api.request<List<dynamic>>(
       path: '/sports',
@@ -66,14 +79,20 @@ class ApiRepository {
   }
 
   Future<ApiResult<List<dynamic>>> getStadiums({
-    String? city,
+    String? countryId,
+    String? cityId,
     int? sportId,
+    double? lat,
+    double? lng,
   }) {
     return api.request<List<dynamic>>(
       path: '/stadiums',
       query: {
-        if (city != null) 'city': city,
+        if (countryId != null) 'country_id': countryId,
+        if (cityId != null) 'city_id': cityId,
         if (sportId != null) 'sport_id': sportId,
+        if (lat != null) 'lat': lat,
+        if (lng != null) 'lng': lng,
       },
       decoder: _asList,
     );
@@ -86,42 +105,110 @@ class ApiRepository {
     );
   }
 
+  Future<ApiResult<List<dynamic>>> getCitiesByCountry(String countryId) {
+    return api.request<List<dynamic>>(
+      path: '/countries/$countryId/cities',
+      decoder: _asList,
+    );
+  }
+
+  Future<ApiResult<Map<String, dynamic>>> updateProfile(
+      dynamic body, {bool multipart = false}) {
+    return api.request<Map<String, dynamic>>(
+      path: '/profile',
+      method: 'POST',
+      auth: true,
+      data: body,
+      multipart: multipart,
+      decoder: (data) {
+        if (data is Map<String, dynamic>) {
+          return data;
+        }
+        return {};
+      },
+    );
+  }
+
   Future<ApiResult<List<dynamic>>> getEvents({
     int? sportId,
-    String? city,
+    String? countryId,
+    String? cityId,
     String? from,
     String? to,
+    double? lat,
+    double? lng,
   }) {
     return api.request<List<dynamic>>(
       path: '/events',
       query: {
+        if (countryId != null) 'country_id': countryId,
         if (sportId != null) 'sport_id': sportId,
-        if (city != null) 'city': city,
+        if (cityId != null) 'city_id': cityId,
         if (from != null) 'from': from,
         if (to != null) 'to': to,
+        if (lat != null) 'lat': lat,
+        if (lng != null) 'lng': lng,
       },
       decoder: _asList,
     );
   }
 
-  Future<ApiResult<List<dynamic>>> getMatches() {
+  Future<ApiResult<List<dynamic>>> getMatches({
+    String? countryId,
+    String? cityId,
+    int? sportId,
+    double? lat,
+    double? lng,
+  }) {
     return api.request<List<dynamic>>(
       path: '/matches',
+      query: {
+        if (countryId != null) 'country_id': countryId,
+        if (cityId != null) 'city_id': cityId,
+        if (sportId != null) 'sport_id': sportId,
+        if (lat != null) 'lat': lat,
+        if (lng != null) 'lng': lng,
+      },
       decoder: _asList,
     );
   }
 
-  Future<ApiResult<List<dynamic>>> getChallenges() {
+  Future<ApiResult<List<dynamic>>> getChallenges({
+    String? countryId,
+    String? cityId,
+    int? sportId,
+    double? lat,
+    double? lng,
+  }) {
     return api.request<List<dynamic>>(
       path: '/challenges',
+      query: {
+        if (countryId != null) 'country_id': countryId,
+        if (cityId != null) 'city_id': cityId,
+        if (sportId != null) 'sport_id': sportId,
+        if (lat != null) 'lat': lat,
+        if (lng != null) 'lng': lng,
+      },
       decoder: _asList,
     );
   }
 
-  Future<ApiResult<List<dynamic>>> getProducts() {
+  Future<ApiResult<List<dynamic>>> getTrainers({
+    String? countryId,
+    String? cityId,
+    int? sportId,
+    double? lat,
+    double? lng,
+  }) {
     return api.request<List<dynamic>>(
-      path: '/products',
-      auth: true,
+      path: '/trainers',
+      query: {
+        if (countryId != null) 'country_id': countryId,
+        if (cityId != null) 'city_id': cityId,
+        if (sportId != null) 'sport_id': sportId,
+        if (lat != null) 'lat': lat,
+        if (lng != null) 'lng': lng,
+      },
       decoder: _asList,
     );
   }

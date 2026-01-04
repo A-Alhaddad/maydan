@@ -153,9 +153,11 @@ class _DialCodeSelector extends StatelessWidget {
                 if (val == null) return;
                 final country = items.firstWhere(
                     (c) => c['dialCode'] == val,
-                    orElse: () => {});
+                    orElse: () => <String, String>{});
                 controller.selectCountry(
-                    val, country['name'] ?? controller.selectedCountryName);
+                    val,
+                    country['name'] ?? controller.selectedCountryName,
+                    id: country['id']);
               },
               items: items.isNotEmpty
                   ? items

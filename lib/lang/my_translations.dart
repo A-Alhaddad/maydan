@@ -56,7 +56,7 @@ class MyTranslations extends Translations {
           "homeActionSearchMatch": "ابحث عن مباراة",
           "homeReservedMatches": "المباريات المحيطة",
           "homeMore": "المزيد",
-          "homeReservedStadiums": "الملاعب المحيطة",
+          "homeReservedStadiums": "احجز ملعب",
           "availableStadiums": "الملاعب المتاحة",
           "homeExtraOptions": "خيارات إضافية",
           "homeCurrencyPerHour": "ريال / س",
@@ -135,7 +135,6 @@ class MyTranslations extends Translations {
           "selectTimeStartEnd": "حدد ساعة البداية وساعة النهاية",
           "aboutStadium": "عن الملعب",
           "pay?": "من سيقوم بالدفع ؟",
-
         },
 
         // ======================================================================
@@ -270,7 +269,6 @@ class MyTranslations extends Translations {
           "selectTimeStartEnd": "Select Hour Start To End",
           "aboutStadium": "About Stadium",
           "pay?": "Who will pay?",
-
         }
       };
 }

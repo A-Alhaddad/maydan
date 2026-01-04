@@ -65,7 +65,7 @@ class _CustomMainButtonState extends State<CustomMainButton> {
               : Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25.w),
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
                       Expanded(
                         child: CustomText(

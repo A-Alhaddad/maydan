@@ -19,34 +19,47 @@ class Home extends StatelessWidget {
         }
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: Column(
-            children: [
-              SizedBox(height: 30.h),
-              Expanded(
-                child: ListView(
-                  children: [
-                    _buildHeader(controller),
-                    SizedBox(height: 24.h),
-                    _buildLastMatchCard(),
-                    SizedBox(height: 24.h),
-                    SportsTabs(
-                      items: controller.sportsList,
-                      selectedIndex: controller.selectedSportTapIndex,
-                      onTap: controller.changeSport,
+          child: RefreshIndicator(
+            color: AppColors.green,
+            backgroundColor: Colors.black87,
+            onRefresh: () async {
+              await AppGet.to.loadHomeData(keepSelectedSport: true);
+            },
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(child: SizedBox(height: 10.h)),
+                SliverToBoxAdapter(child: _buildHeader(controller)),
+                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                SliverToBoxAdapter(child: _buildLastMatchCard()),
+                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _SportsHeaderDelegate(
+                    minExtent: 100.h,
+                    maxExtent: 100.h,
+                    child: Container(
+                      color: Colors.transparent,
+                      child: SportsTabs(
+                        items: controller.sportsList,
+                        selectedIndex: controller.selectedSportTapIndex,
+                        isLoading: controller.isSportLoading,
+                        onTap: controller.changeSport,
+                      ),
                     ),
-                    SizedBox(height: 24.h),
-                    _buildActionsRow(),
-                    SizedBox(height: 24.h),
-                    _buildReservedMatchesSection(),
-                    SizedBox(height: 24.h),
-                    _buildReservedStadiumsSection(),
-                    SizedBox(height: 24.h),
-                    _buildCoachesSection(),
-                    SizedBox(height: 10.h),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                SliverToBoxAdapter(child: _buildActionsRow()),
+                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                SliverToBoxAdapter(child: _buildReservedMatchesSection()),
+                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                SliverToBoxAdapter(child: _buildReservedStadiumsSection()),
+                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                SliverToBoxAdapter(child: _buildCoachesSection()),
+                SliverToBoxAdapter(child: SizedBox(height: 100.h)),
+              ],
+            ),
           ),
         );
       },
@@ -54,7 +67,9 @@ class Home extends StatelessWidget {
   }
 
   Widget _buildHeader(AppGet controller) {
-    final userName = 'عبد الله!';
+    final userName = controller.userName?.isNotEmpty == true
+        ? controller.userName!
+        : 'المستخدم';
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,8 +288,8 @@ class Home extends StatelessWidget {
   Widget _matchCard(Map<String, dynamic> match) {
     final photoUrl = match["photoUrl"] ?? "";
     return Container(
-      width: 370.w,
-      height: 140.h,
+      width: 330.w,
+      constraints: BoxConstraints(minHeight: 150.h),
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.06),
@@ -303,6 +318,7 @@ class Home extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 CustomText(
                   match["name"] ?? "",
@@ -310,60 +326,29 @@ class Home extends StatelessWidget {
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                   textAlign: TextAlign.start,
+                  maxLines: 1,
                 ),
-                SizedBox(height: 12.h),
+                SizedBox(height: 6.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 28.w,
-                      height: 28.w,
-                      decoration: BoxDecoration(
-                        color: AppColors.green,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.calendar_month,
-                        size: 16.sp,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: 6.w),
-                    CustomText(
-                      match["date"] ?? "",
-                      fontSize: 14.sp,
-                      color: Colors.white,
-                    ),
-                    SizedBox(width: 14.w),
-                    Container(
-                      width: 28.w,
-                      height: 28.w,
-                      decoration: BoxDecoration(
-                        color: AppColors.green,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.access_time,
-                        size: 16.sp,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: 6.w),
-                    CustomText(
-                      match["time"] ?? "",
-                      fontSize: 14.sp,
-                      color: Colors.white,
-                    ),
+                    _iconChip(
+                        icon: Icons.calendar_month, text: match["date"] ?? ""),
+                    SizedBox(width: 10.w),
+                    _iconChip(
+                        icon: Icons.access_time, text: match["time"] ?? ""),
                   ],
                 ),
-                SizedBox(height: 10.h),
+                SizedBox(height: 8.h),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               CustomSvgImage(
                                 imageName: 'icon6',
@@ -371,16 +356,18 @@ class Home extends StatelessWidget {
                                 height: 15.h,
                               ),
                               SizedBox(width: 6.w),
-                              CustomText(
-                                match["available"] ?? "",
-                                fontSize: 14.sp,
-                                color: Colors.white,
+                              Flexible(
+                                child: CustomText(
+                                  match["available"] ?? "",
+                                  fontSize: 14.sp,
+                                  color: Colors.white,
+                                  maxLines: 1,
+                                ),
                               ),
                             ],
                           ),
-                          SizedBox(height: 8.h),
+                          SizedBox(height: 6.h),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Icon(
                                 Icons.location_on_outlined,
@@ -388,16 +375,20 @@ class Home extends StatelessWidget {
                                 color: AppColors.green,
                               ),
                               SizedBox(width: 6.w),
-                              CustomText(
-                                match["location"] ?? "",
-                                fontSize: 14.sp,
-                                color: Colors.white,
+                              Expanded(
+                                child: CustomText(
+                                  match["location"] ?? "",
+                                  fontSize: 14.sp,
+                                  color: Colors.white,
+                                  maxLines: 1,
+                                ),
                               ),
                             ],
                           ),
                         ],
                       ),
                     ),
+                    SizedBox(width: 8.w),
                     CustomText(
                       match["price"] ?? "",
                       fontSize: 20.sp,
@@ -405,9 +396,44 @@ class Home extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ],
-                )
+                ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _iconChip({required IconData icon, required String text}) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 24.w,
+            height: 24.w,
+            decoration: BoxDecoration(
+              color: AppColors.green,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 14.sp,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(width: 6.w),
+          CustomText(
+            text,
+            fontSize: 13.sp,
+            color: Colors.white,
+            maxLines: 1,
           ),
         ],
       ),
@@ -473,26 +499,26 @@ class Home extends StatelessWidget {
             height: 190.h,
             width: double.infinity,
             padding: EdgeInsets.only(top: 10.h, right: 10.w, left: 10.w),
-          child: ClipRRect(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(26.r),
-              bottom: Radius.circular(26.r),
-            ),
-            child: SizedBox(
-              height: 190.h,
-              width: double.infinity,
-              child: imageUrl.isNotEmpty
-                  ? CustomPngImageNetwork(
-                      imageUrl: imageUrl,
-                      boxFit: BoxFit.cover,
-                    )
-                  : CustomPngImage(
-                      imageName: stadium["image"] ?? "",
-                      boxFit: BoxFit.cover,
-                    ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(26.r),
+                bottom: Radius.circular(26.r),
+              ),
+              child: SizedBox(
+                height: 190.h,
+                width: double.infinity,
+                child: imageUrl.isNotEmpty
+                    ? CustomPngImageNetwork(
+                        imageUrl: imageUrl,
+                        boxFit: BoxFit.cover,
+                      )
+                    : CustomPngImage(
+                        imageName: stadium["image"] ?? "",
+                        boxFit: BoxFit.cover,
+                      ),
+              ),
             ),
           ),
-        ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 18.h),
             child: Column(
@@ -631,7 +657,7 @@ class Home extends StatelessWidget {
             as ImageProvider<Object>;
     return Container(
       width: 130.w,
-      padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
+      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 14.w),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22.r),
         border: Border.all(
@@ -640,36 +666,77 @@ class Home extends StatelessWidget {
         ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           CircleAvatar(
-            radius: 35.r,
+            radius: 30.r,
             backgroundImage: avatar,
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 8.h),
           CustomText(
             coach["name"],
-            fontSize: 16.sp,
+            fontSize: 15.sp,
             color: Colors.white,
             fontWeight: FontWeight.w600,
             maxLines: 2,
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 8.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomText(
                 coach["rate"],
-                fontSize: 15.sp,
+                fontSize: 14.sp,
                 color: AppColors.green,
                 fontWeight: FontWeight.w600,
               ),
               SizedBox(width: 3.w),
-              Icon(Icons.star, color: AppColors.green, size: 15.sp),
+              Icon(Icons.star, color: AppColors.green, size: 14.sp),
             ],
           ),
         ],
       ),
     );
+  }
+}
+
+class _SportsHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final double minExtent;
+  final double maxExtent;
+  final Widget child;
+
+  _SportsHeaderDelegate({
+    required this.minExtent,
+    required this.maxExtent,
+    required this.child,
+  });
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final isPinned = shrinkOffset > 0;
+    final topPad = isPinned ? 20.0 : 0.0;
+    final bgColor =
+        isPinned ? Colors.black.withOpacity(0.5) : Colors.transparent;
+    return SizedBox(
+      height: maxExtent,
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(24.r),
+        ),
+        padding: EdgeInsets.only(top: topPad, left: 0, right: 0, bottom: 6.0),
+        alignment: Alignment.centerLeft,
+        child: child,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _SportsHeaderDelegate oldDelegate) {
+    return oldDelegate.child != child ||
+        oldDelegate.minExtent != minExtent ||
+        oldDelegate.maxExtent != maxExtent;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:maydan/splash.dart';
 import 'package:maydan/widgets/my_library.dart';
 
@@ -38,21 +39,28 @@ class _MyAppState extends State<MyApp> {
           translations: MyTranslations(),
           builder: (context, widget) {
             final size = MediaQuery.of(context).size;
-            return Stack(
-              children: [
-                CustomPngImage(
-                  imageName: 'background',
-                  width: size.width,
-                  height: size.height,
-                  boxFit: BoxFit.fill,
-                ),
-                MediaQuery(
-                  data: MediaQuery.of(context).copyWith(
-                    textScaler: const TextScaler.linear(1.0),
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle.light.copyWith(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: Brightness.light,
+                statusBarBrightness: Brightness.dark,
+              ),
+              child: Stack(
+                children: [
+                  CustomPngImage(
+                    imageName: 'background',
+                    width: size.width,
+                    height: size.height,
+                    boxFit: BoxFit.fill,
                   ),
-                  child: widget!,
-                ),
-              ],
+                  MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      textScaler: const TextScaler.linear(1.0),
+                    ),
+                    child: widget!,
+                  ),
+                ],
+              ),
             );
           },
           locale: Locale(

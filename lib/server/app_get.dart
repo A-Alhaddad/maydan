@@ -1,6 +1,9 @@
 // TODO Implement this library.
 import 'dart:async';
+import 'dart:io';
+import 'package:dio/dio.dart' as dio;
 
+import 'package:maydan/page/login&regiester/SignIn.dart';
 import 'package:maydan/page/userPages/service/booking/stadium_booking.dart';
 import 'package:maydan/server/api_repository.dart';
 import 'package:maydan/page/login&regiester/otp.dart';
@@ -22,11 +25,12 @@ class AppGet extends GetxController {
   late Locale appLocale;
   String? otpErrorMessage;
   bool isAuthBusy = false;
+  bool isOtpChangingPhone = false;
   int bottomNavIndex = 0;
   int selectedServiceIndex = 0;
   int selectedSportTapIndex = 0;
   int selectedMatchTypeIndex = 0;
-  String urlWebApp = 'http://ec2-100-27-245-250.compute-1.amazonaws.com';
+  String urlWebApp = 'http://192.168.0.3/maydan/index.php';
   Widget? widgetHome;
   bool isHomeUserLoading = true;
   List<Map<String, dynamic>> sportsList = [];
@@ -37,11 +41,32 @@ class AppGet extends GetxController {
   List<Map<String, dynamic>> _allStadiums = [];
   List<Map<String, dynamic>> coaches = [];
   List<Map<String, dynamic>> _allCoaches = [];
+  final Map<int?, List<Map<String, dynamic>>> _matchesCache = {};
+  final Map<int?, List<Map<String, dynamic>>> _stadiumsCache = {};
+  final Map<int?, List<Map<String, dynamic>>> _coachesCache = {};
   List<Map<String, String>> countries = [];
+  List<Map<String, String>> cities = [];
   String selectedDialCode = '+966';
   String selectedCountryName = 'Saudi Arabia';
+  String? selectedCountryId;
+  String? selectedCityId;
+  String? selectedCityName;
+  String? citiesCountryId;
   int? selectedSportId;
   Map<String, dynamic> selectStadium = {};
+  Map<String, dynamic>? currentUser;
+  String? userName;
+  String? userImageUrl;
+  String? userMobile;
+  int? userId;
+  String? userEmail;
+  String? userCountryId;
+  String? userCityId;
+  String? userLocale;
+  bool isProfileSaving = false;
+  double? userLat;
+  double? userLng;
+  bool isSportLoading = false;
 
   //////////////////// init ///////////////////////////
   @override
@@ -59,6 +84,9 @@ class AppGet extends GetxController {
 
   Future<void> _initBootstrap() async {
     await fetchCountries();
+    if (AppPreferences().getTokenUser.isNotEmpty) {
+      await fetchUserProfile(silent: true);
+    }
     await loadHomeData();
   }
 
@@ -76,10 +104,25 @@ class AppGet extends GetxController {
     {"key": "serviceMatchTypeActivity", "icon": "serviceMatchType3"}, // أنشطة
   ];
   final List<Map<String, dynamic>> _fallbackSports = [
-    {"key": "homeFootball", "name": "Football", "image": "ball1", "imageUrl": ""},
-    {"key": "homeBasketball", "name": "Basketball", "image": "ball22", "imageUrl": ""},
+    {
+      "key": "homeFootball",
+      "name": "Football",
+      "image": "ball1",
+      "imageUrl": ""
+    },
+    {
+      "key": "homeBasketball",
+      "name": "Basketball",
+      "image": "ball22",
+      "imageUrl": ""
+    },
     {"key": "homeTennis", "name": "Tennis", "image": "ball3", "imageUrl": ""},
-    {"key": "homeVolleyball", "name": "Volleyball", "image": "ball4", "imageUrl": ""},
+    {
+      "key": "homeVolleyball",
+      "name": "Volleyball",
+      "image": "ball4",
+      "imageUrl": ""
+    },
   ];
 
   final List<Map<String, dynamic>> _fallbackMatches = [
@@ -337,6 +380,7 @@ class AppGet extends GetxController {
     required String mobile,
     required BuildContext context,
     String role = 'player',
+    String name = '',
   }) async {
     if (mobile.isEmpty) {
       messageError(
@@ -347,10 +391,23 @@ class AppGet extends GetxController {
       return;
     }
 
+    // Resolve country id from selection (fallback to matching dial code)
+    String? countryId = selectedCountryId;
+    if ((countryId == null || countryId.isEmpty) &&
+        selectedDialCode.isNotEmpty) {
+      final match = countries.firstWhere(
+          (c) => c['dialCode'] == selectedDialCode,
+          orElse: () => {});
+      countryId = match['id'];
+    }
+
     isAuthBusy = true;
     update(['SignUp', 'OTP']);
-    final res =
-        await apiRepository.register(mobile: _formatMobile(mobile), role: role);
+    final res = await apiRepository.register(
+        mobile: _formatMobile(mobile),
+        role: role,
+        name: name,
+        countryId: countryId);
     isAuthBusy = false;
     update(['SignUp', 'OTP']);
 
@@ -385,8 +442,7 @@ class AppGet extends GetxController {
     isAuthBusy = true;
     update(['OTP']);
     final res =
-        await apiRepository.verifyOtp(
-            mobile: _formatMobile(mobile), otp: code);
+        await apiRepository.verifyOtp(mobile: _formatMobile(mobile), otp: code);
     isAuthBusy = false;
     update(['OTP']);
 
@@ -399,24 +455,59 @@ class AppGet extends GetxController {
     otpErrorMessage = '';
     update(['OTP']);
 
+    final userFromOtp = _extractUser(res.data);
+    if (userFromOtp != null) {
+      _setUserData(userFromOtp);
+    }
+
     final token = _extractToken(res.data);
     if (!goToReset) {
       await _handleAuthSuccess(token: token);
     } else if (token != null && token.isNotEmpty) {
-      await AppPreferences()
-          .saveStringValue(value: token, key: 'tokenUser');
+      await AppPreferences().saveStringValue(value: token, key: 'tokenUser');
       apiRepository.api.setAuthToken(token);
+    }
+    return true;
+  }
+
+  Future<bool> verifyOtpForMobileChange({
+    required String formattedMobile,
+    required String code,
+  }) async {
+    if (code.trim().isEmpty) {
+      otpErrorMessage = 'otpShort'.tr;
+      update(['ProfileUpdate']);
+      return false;
+    }
+    isOtpChangingPhone = true;
+    update(['ProfileUpdate']);
+    final res =
+        await apiRepository.verifyOtp(mobile: formattedMobile, otp: code);
+    isOtpChangingPhone = false;
+    update(['ProfileUpdate']);
+
+    if (!res.success) {
+      otpErrorMessage = res.message ?? 'otpWrong'.tr;
+      update(['ProfileUpdate']);
+      return false;
+    }
+    otpErrorMessage = '';
+    update(['ProfileUpdate']);
+
+    final token = _extractToken(res.data);
+    if (token != null && token.isNotEmpty) {
+      await _handleAuthSuccess(token: token);
     }
     return true;
   }
 
   Future<void> _handleAuthSuccess({String? token}) async {
     if (token != null && token.isNotEmpty) {
-      await AppPreferences()
-          .saveStringValue(value: token, key: 'tokenUser');
+      await AppPreferences().saveStringValue(value: token, key: 'tokenUser');
       await AppPreferences().saveBoolValue(value: true, key: 'isLogin');
       apiRepository.api.setAuthToken(token);
     }
+    await fetchUserProfile();
     await loadHomeData();
   }
 
@@ -427,14 +518,276 @@ class AppGet extends GetxController {
       return data['access_token'].toString();
     }
     if (data['auth_token'] != null) return data['auth_token'].toString();
-    if (data['data'] is Map<String, dynamic> &&
-        data['data']['token'] != null) {
+    if (data['data'] is Map<String, dynamic> && data['data']['token'] != null) {
       return data['data']['token'].toString();
     }
     return null;
   }
 
-  Future<void> loadHomeData() async {
+  Map<String, dynamic>? _extractUser(Map<String, dynamic>? data) {
+    if (data == null) return null;
+    if (data['user'] is Map<String, dynamic>) {
+      return Map<String, dynamic>.from(data['user'] as Map<String, dynamic>);
+    }
+    if (data['data'] is Map<String, dynamic>) {
+      final inner = data['data'] as Map<String, dynamic>;
+      if (inner['user'] is Map<String, dynamic>) {
+        return Map<String, dynamic>.from(inner['user'] as Map<String, dynamic>);
+      }
+      // إذا كان الرد مباشرة بيانات المستخدم داخل data
+      if (inner.containsKey('name') || inner.containsKey('mobile')) {
+        return inner;
+      }
+    }
+    if (data.containsKey('name') || data.containsKey('mobile')) {
+      return data;
+    }
+    return null;
+  }
+
+  void _setUserData(Map<String, dynamic>? user) {
+    if (user == null || user.isEmpty) return;
+    currentUser = user;
+    userId = int.tryParse(user['id']?.toString() ?? '');
+    userName = _extractUserName(user);
+    userMobile = user['mobile']?.toString();
+    userImageUrl = _extractUserImage(user);
+    userEmail = user['email']?.toString();
+    // بلد/مدينة من مفاتيح مباشرة أو كائنات متداخلة
+    final countryObj = user['country'] is Map<String, dynamic>
+        ? user['country'] as Map<String, dynamic>
+        : null;
+    final cityObj = user['city'] is Map<String, dynamic>
+        ? user['city'] as Map<String, dynamic>
+        : null;
+
+    userCountryId = user['country_id']?.toString() ??
+        user['countryId']?.toString() ??
+        countryObj?['id']?.toString();
+    userCityId = user['city_id']?.toString() ??
+        user['cityId']?.toString() ??
+        cityObj?['id']?.toString();
+
+    userLocale = user['locale']?.toString();
+    selectedCountryId = userCountryId ?? selectedCountryId;
+    selectedCityId = userCityId ?? selectedCityId;
+
+    // Sync selected country/dial if available
+    if (userCountryId != null && userCountryId!.isNotEmpty) {
+      final match = countries.firstWhere((c) => c['id'] == userCountryId,
+          orElse: () => {});
+      if (match.isNotEmpty) {
+        selectedCountryId = match['id'];
+        selectedCountryName = match['name'] ?? selectedCountryName;
+        selectedDialCode = match['dialCode'] ?? selectedDialCode;
+      }
+    } else if (countryObj != null) {
+      selectedCountryId = countryObj['id']?.toString() ?? selectedCountryId;
+      selectedCountryName =
+          countryObj['name']?.toString() ?? selectedCountryName;
+      final dial = countryObj['phone_code']?.toString();
+      if (dial != null && dial.isNotEmpty) {
+        selectedDialCode = dial.startsWith('+') ? dial : '+$dial';
+      }
+    }
+    update(['Profile', 'Home', 'ProfileUpdate']);
+  }
+
+  String? _extractUserName(Map<String, dynamic> user) {
+    final raw = user['name'] ??
+        user['full_name'] ??
+        user['username'] ??
+        user['first_name'];
+    if (raw == null) return null;
+    final name = raw.toString().trim();
+    return name.isEmpty ? null : name;
+  }
+
+  String? _extractUserImage(Map<String, dynamic> user) {
+    return user['image'];
+  }
+
+  Future<void> fetchUserProfile({bool silent = false}) async {
+    final token = AppPreferences().getTokenUser;
+    if (token.isEmpty) return;
+    apiRepository.api.setAuthToken(token);
+    final res = await apiRepository.getProfile();
+    if (res.success) {
+      final user = _extractUser(res.data);
+      _setUserData(user);
+    } else {
+      if (!silent) {
+        printLog('Failed to fetch profile: ${res.message}');
+      }
+    }
+  }
+
+  void updateUserLocally({
+    String? name,
+    String? mobile,
+    String? imageUrl,
+    String? email,
+    String? countryId,
+    String? countryName,
+    String? cityId,
+    String? cityName,
+    String? locale,
+    String? dialCode,
+  }) {
+    if (name != null && name.trim().isNotEmpty) {
+      userName = name.trim();
+      currentUser ??= {};
+      currentUser!['name'] = userName;
+    }
+    if (mobile != null && mobile.trim().isNotEmpty) {
+      userMobile = mobile.trim();
+      currentUser ??= {};
+      currentUser!['mobile'] = userMobile;
+    }
+    if (email != null && email.trim().isNotEmpty) {
+      userEmail = email.trim();
+      currentUser ??= {};
+      currentUser!['email'] = userEmail;
+    }
+    if (countryId != null && countryId.trim().isNotEmpty) {
+      userCountryId = countryId.trim();
+      selectedCountryId = userCountryId;
+      currentUser ??= {};
+      currentUser!['country_id'] = userCountryId;
+    }
+    if (countryName != null && countryName.trim().isNotEmpty) {
+      selectedCountryName = countryName.trim();
+    }
+    if (cityId != null && cityId.trim().isNotEmpty) {
+      userCityId = cityId.trim();
+      selectedCityId = userCityId;
+      currentUser ??= {};
+      currentUser!['city_id'] = userCityId;
+      if (cityName != null && cityName.trim().isNotEmpty) {
+        selectedCityName = cityName.trim();
+      }
+    }
+    if (locale != null && locale.trim().isNotEmpty) {
+      userLocale = locale.trim();
+      currentUser ??= {};
+      currentUser!['locale'] = userLocale;
+    }
+    if (dialCode != null && dialCode.trim().isNotEmpty) {
+      selectedDialCode = dialCode.trim();
+    }
+    if (imageUrl != null && imageUrl.trim().isNotEmpty) {
+      userImageUrl = imageUrl.trim();
+      currentUser ??= {};
+      currentUser!['image'] = userImageUrl;
+    }
+    update(['Profile', 'Home', 'ProfileUpdate']);
+  }
+
+  Future<void> logOut() async {
+    await AppPreferences().logOut();
+    apiRepository.api.setAuthToken('');
+    currentUser = null;
+    userName = null;
+    userMobile = null;
+    userImageUrl = null;
+    userEmail = null;
+    userCountryId = null;
+    userCityId = null;
+    userLocale = null;
+    selectedCountryId = null;
+    selectedCityId = null;
+    selectedCityName = null;
+    cities = [];
+    citiesCountryId = null;
+    update(['Profile', 'Home']);
+    Get.offAll(SignIn());
+  }
+
+  Future<Map<String, dynamic>> updateProfileOnServer({
+    String? name,
+    String? email,
+    String? mobile,
+    String? countryId,
+    String? cityId,
+    String? locale,
+    String? avatarUrl,
+    File? imageFile,
+  }) async {
+    final Map<String, dynamic> body = {
+      '_method': 'put',
+      if (name != null && name.trim().isNotEmpty) 'name': name.trim(),
+      if (email != null && email.trim().isNotEmpty) 'email': email.trim(),
+      if (mobile != null && mobile.trim().isNotEmpty) 'mobile': mobile.trim(),
+      if (countryId != null && countryId.trim().isNotEmpty)
+        'country_id': countryId.trim(),
+      if (cityId != null && cityId.trim().isNotEmpty) 'city_id': cityId.trim(),
+      if (locale != null && locale.trim().isNotEmpty) 'locale': locale.trim(),
+      if (avatarUrl != null && avatarUrl.trim().isNotEmpty)
+        'avatar_url': avatarUrl.trim(),
+    };
+
+    bool hasImage = imageFile != null;
+    dynamic payload;
+
+    if (hasImage) {
+      final fileName = imageFile!.path.split(Platform.pathSeparator).last;
+      payload = dio.FormData.fromMap(body)
+        ..files.add(MapEntry(
+          'image',
+          await dio.MultipartFile.fromFile(imageFile!.path, filename: fileName),
+        ));
+    } else {
+      payload = body;
+      if (body.isEmpty) {
+        return {
+          'success': true,
+        };
+      }
+    }
+
+    isProfileSaving = true;
+    update(['ProfileUpdate']);
+    final res = await apiRepository.updateProfile(payload, multipart: hasImage);
+    isProfileSaving = false;
+    update(['ProfileUpdate']);
+
+    if (!res.success) {
+      final ctx = Get.context ?? Get.overlayContext;
+      if (ctx != null) {
+        messageError(
+          title: 'خطأ',
+          bodyString: res.message ?? 'تعذر تحديث البيانات',
+          cancelText: 'اغلاق',
+          context: ctx,
+        );
+      } else {
+        printLog('Update profile failed: ${res.message}');
+      }
+      return {
+        'success': false,
+        'message': res.message,
+      };
+    }
+
+    final user = _extractUser(res.data);
+    if (user != null) {
+      _setUserData(user);
+    }
+
+    // التقاط رقم الهاتف للـ OTP فقط من الجذر (خارج data)
+    String? mobileForOtp;
+    if (res.data is Map<String, dynamic>) {
+      final map = res.data as Map<String, dynamic>;
+      mobileForOtp = map['mobile']?.toString();
+    }
+
+    return {
+      'success': true,
+      'mobileForOtp': mobileForOtp,
+    };
+  }
+
+  Future<void> loadHomeData({bool keepSelectedSport = false}) async {
     isHomeUserLoading = true;
     update(['Home', 'Service']);
     try {
@@ -443,24 +796,18 @@ class AppGet extends GetxController {
           ? _mapSports(sportsRes.data!)
           : _fallbackSports;
 
-      final stadiumRes = await apiRepository.getStadiums();
-      _allStadiums =
-          _withFallback(_mapStadiums(stadiumRes.data), _fallbackStadiums);
+      // ضبط الرياضة الأولى كافتراض
+      if (sportsList.isNotEmpty && !keepSelectedSport) {
+        selectedSportTapIndex = 0;
+        selectedSportId = _extractSportId(0);
+      }
 
-      final matchesRes = await apiRepository.getMatches();
-      final challengesRes = await apiRepository.getChallenges();
-      final eventsRes = await apiRepository.getEvents();
-      final mappedMatches = [
-        ..._mapMatches(matchesRes.data, type: 'match'),
-        ..._mapMatches(challengesRes.data, type: 'challenge'),
-        ..._mapEvents(eventsRes.data),
-      ];
-      _allMatches = mappedMatches.isNotEmpty ? mappedMatches : _fallbackMatches;
+      // تفريغ الكاشات ثم تحميل بيانات الرياضة الحالية
+      _matchesCache.clear();
+      _stadiumsCache.clear();
+      _coachesCache.clear();
 
-      final productsRes = await apiRepository.getProducts();
-      _allCoaches =
-          _withFallback(_mapCoaches(productsRes.data), _fallbackCoaches);
-
+      await _loadDataForSport(selectedSportId, showPageLoader: true);
       _applySportFilter();
       changeMatchType(selectedMatchTypeIndex);
     } finally {
@@ -469,11 +816,13 @@ class AppGet extends GetxController {
     }
   }
 
-  void changeSport(int index) {
+  Future<void> changeSport(int index) async {
     selectedSportTapIndex = index;
     selectedSportId = _extractSportId(index);
-    _applySportFilter();
-    changeMatchType(selectedMatchTypeIndex);
+    isSportLoading = true;
+    update(['Home', 'Service']);
+    await _loadDataForSport(selectedSportId);
+    isSportLoading = false;
     update(['Home', 'Service']);
   }
 
@@ -546,9 +895,14 @@ class AppGet extends GetxController {
   List<Map<String, dynamic>> _filterCoachesBySport(
       List<Map<String, dynamic>> source) {
     if (selectedSportId == null) return source;
-    return source
-        .where((c) => c['sportId']?.toString() == selectedSportId.toString())
-        .toList();
+    return source.where((c) {
+      final sid = c['sportId']?.toString();
+      final list = c['sportIds'] is List
+          ? (c['sportIds'] as List).map((e) => '$e').toList()
+          : const <String>[];
+      return sid == selectedSportId.toString() ||
+          list.contains('${selectedSportId}');
+    }).toList();
   }
 
   int? _extractSportId(int index) {
@@ -557,6 +911,95 @@ class AppGet extends GetxController {
     final id = item['id'] ?? item['sport_id'];
     if (id == null) return null;
     return int.tryParse(id.toString()) ?? id as int?;
+  }
+
+  Future<void> _loadDataForSport(int? sportId, {bool showPageLoader = false}) async {
+    final cacheKey = sportId;
+
+    // استخدم الكاش إذا كان متوفر
+    if (_matchesCache.containsKey(cacheKey) &&
+        _stadiumsCache.containsKey(cacheKey) &&
+        _coachesCache.containsKey(cacheKey)) {
+      _allMatches = _matchesCache[cacheKey] ?? [];
+      _allStadiums = _stadiumsCache[cacheKey] ?? [];
+      _allCoaches = _coachesCache[cacheKey] ?? [];
+      _applySportFilter();
+      changeMatchType(selectedMatchTypeIndex);
+      update(['Home', 'Service']);
+      return;
+    }
+
+    if (showPageLoader) {
+      isHomeUserLoading = true;
+      update(['Home']);
+    }
+    try {
+      final matchesRes = await apiRepository.getMatches(
+        countryId: selectedCountryId,
+        cityId: selectedCityId,
+        sportId: sportId,
+        lat: userLat,
+        lng: userLng,
+      );
+      final challengesRes = await apiRepository.getChallenges(
+        countryId: selectedCountryId,
+        cityId: selectedCityId,
+        sportId: sportId,
+        lat: userLat,
+        lng: userLng,
+      );
+      final eventsRes = await apiRepository.getEvents(
+        countryId: selectedCountryId,
+        cityId: selectedCityId,
+        sportId: sportId,
+        lat: userLat,
+        lng: userLng,
+      );
+
+      final mappedMatches = [
+        ..._mapMatches(matchesRes.data, type: 'match'),
+        ..._mapMatches(challengesRes.data, type: 'challenge'),
+        ..._mapEvents(eventsRes.data),
+      ];
+      final resolvedMatches =
+          mappedMatches.isNotEmpty ? mappedMatches : _fallbackMatches;
+
+      final stadiumRes = await apiRepository.getStadiums(
+        countryId: selectedCountryId,
+        cityId: selectedCityId,
+        sportId: sportId,
+        lat: userLat,
+        lng: userLng,
+      );
+      final resolvedStadiums =
+          _withFallback(_mapStadiums(stadiumRes.data), _fallbackStadiums);
+
+      final trainersRes = await apiRepository.getTrainers(
+        countryId: selectedCountryId,
+        cityId: selectedCityId,
+        sportId: sportId,
+        lat: userLat,
+        lng: userLng,
+      );
+      final resolvedCoaches =
+          _withFallback(_mapCoaches(trainersRes.data), _fallbackCoaches);
+
+      _matchesCache[cacheKey] = resolvedMatches;
+      _stadiumsCache[cacheKey] = resolvedStadiums;
+      _coachesCache[cacheKey] = resolvedCoaches;
+
+      _allMatches = resolvedMatches;
+      _allStadiums = resolvedStadiums;
+      _allCoaches = resolvedCoaches;
+
+      _applySportFilter();
+      changeMatchType(selectedMatchTypeIndex);
+    } finally {
+      if (showPageLoader) {
+        isHomeUserLoading = false;
+      }
+      update(['Home', 'Service']);
+    }
   }
 
   List<Map<String, dynamic>> _mapSports(List<dynamic> data) {
@@ -577,115 +1020,136 @@ class AppGet extends GetxController {
   List<Map<String, dynamic>> _mapMatches(List<dynamic>? data,
       {required String type}) {
     if (data == null) return [];
-    return data.map<Map<String, dynamic>>((item) {
-      final Map<String, dynamic> map =
-          item is Map<String, dynamic> ? item : {};
-      final Map<String, dynamic> stadium =
-          map['stadium'] is Map<String, dynamic>
-              ? map['stadium'] as Map<String, dynamic>
-              : <String, dynamic>{};
-      final sportId = map['sport_id'] ?? map['sportId'];
-      final startAt = map['start_at']?.toString() ??
-          map['startAt']?.toString() ??
-          map['start']?.toString();
-      final endAt =
-          map['end_at']?.toString() ?? map['endAt']?.toString() ?? '';
-      final availableSlots = map['available_slots'] ??
-          map['available'] ??
-          map['slots'] ??
-          map['max_slots'];
-      final city = stadium['city'] ?? map['city'];
-      final country = stadium['country'] ?? map['country'];
-      return {
-        'id': map['id']?.toString() ?? '',
-        'name': map['name']?.toString() ??
-            map['title']?.toString() ??
-            'المباراة',
-        'time': _formatTimeRange(startAt, endAt),
-        'date': _formatDate(startAt),
-        'available': availableSlots != null
-            ? '$availableSlots أماكن متاحة'
-            : 'متاح',
-        'location': _composeLocation(stadium, city: city, country: country),
-        'price': map['price']?.toString() ??
-            stadium['hour_price']?.toString() ??
-            'مجانا',
-        'photoUrl': stadium['image']?.toString() ??
-            (stadium['images'] is List && stadium['images'].isNotEmpty
-                ? stadium['images'][0].toString()
-                : ''),
-        'photo': 'stadiumImg',
-        'type': type,
-        'sportId': sportId,
-        'sport_ids': map['sport_ids'] ?? map['sports'],
-      };
-    }).where((m) => m['id'] != '').toList();
+    return data
+        .map<Map<String, dynamic>>((item) {
+          final Map<String, dynamic> map =
+              item is Map<String, dynamic> ? item : {};
+          final Map<String, dynamic> sport =
+              map['sport'] is Map<String, dynamic>
+                  ? map['sport'] as Map<String, dynamic>
+                  : <String, dynamic>{};
+          final Map<String, dynamic> stadium =
+              map['stadium'] is Map<String, dynamic>
+                  ? map['stadium'] as Map<String, dynamic>
+                  : <String, dynamic>{};
+          final Map<String, dynamic> reservable =
+              map['reservable'] is Map<String, dynamic>
+                  ? map['reservable'] as Map<String, dynamic>
+                  : <String, dynamic>{};
+          final Map<String, dynamic> reservableData =
+              reservable['data'] is Map<String, dynamic>
+                  ? reservable['data'] as Map<String, dynamic>
+                  : <String, dynamic>{};
+          final sportId = map['sport_id'] ?? map['sportId'] ?? sport['id'];
+          final startAt = map['start_at']?.toString() ??
+              map['startAt']?.toString() ??
+              map['start']?.toString();
+          final endAt =
+              map['end_at']?.toString() ?? map['endAt']?.toString() ?? '';
+          final availableSlots = map['available_slots'] ??
+              map['available'] ??
+              map['slots'] ??
+              map['max_slots'];
+          final city =
+              stadium['city'] ?? reservableData['city'] ?? map['city'];
+          final country =
+              stadium['country'] ?? reservableData['country'] ?? map['country'];
+          return {
+            'id': map['id']?.toString() ?? '',
+            'name': map['name']?.toString() ??
+                map['title']?.toString() ??
+                'المباراة',
+            'time': _formatTimeRange(startAt, endAt),
+            'date': _formatDate(startAt),
+            'available':
+                availableSlots != null ? '$availableSlots أماكن متاحة' : 'متاح',
+            'location': _composeLocation(stadium, city: city, country: country),
+            'price': map['price']?.toString() ??
+                stadium['hour_price']?.toString() ??
+                'مجانا',
+            'photoUrl': stadium['image']?.toString() ??
+                (stadium['images'] is List && stadium['images'].isNotEmpty
+                    ? stadium['images'][0].toString()
+                    : sport['image']?.toString() ?? ''),
+            'photo': 'stadiumImg',
+            'type': type,
+            'sportId': sportId,
+            'sport_ids': map['sport_ids'] ?? map['sports'] ?? sport['id'],
+          };
+        })
+        .where((m) => m['id'] != '')
+        .toList();
   }
 
   List<Map<String, dynamic>> _mapEvents(List<dynamic>? data) {
     if (data == null) return [];
-    return data.map<Map<String, dynamic>>((item) {
-      final Map<String, dynamic> map =
-          item is Map<String, dynamic> ? item : {};
-      final startAt = map['start_at']?.toString();
-      final endAt = map['end_at']?.toString();
-      return {
-        'id': map['id']?.toString() ?? '',
-        'name': map['name']?.toString() ??
-            map['title']?.toString() ??
-            'نشاط رياضي',
-        'time': _formatTimeRange(startAt, endAt),
-        'date': _formatDate(startAt),
-        'available': map['slots'] != null
-            ? '${map['slots']} أماكن متاحة'
-            : 'متاح',
-        'location': map['location']?.toString() ??
-            _composeLocation(map, city: map['city'], country: map['country']),
-        'price': map['price']?.toString() ?? 'مجانا',
-        'photoUrl': map['image']?.toString() ?? '',
-        'photo': 'stadiumImg',
-        'type': 'activity',
-      };
-    }).where((m) => m['id'] != '').toList();
+    return data
+        .map<Map<String, dynamic>>((item) {
+          final Map<String, dynamic> map =
+              item is Map<String, dynamic> ? item : {};
+          final startAt = map['start_at']?.toString();
+          final endAt = map['end_at']?.toString();
+          return {
+            'id': map['id']?.toString() ?? '',
+            'name': map['name']?.toString() ??
+                map['title']?.toString() ??
+                'نشاط رياضي',
+            'time': _formatTimeRange(startAt, endAt),
+            'date': _formatDate(startAt),
+            'available':
+                map['slots'] != null ? '${map['slots']} أماكن متاحة' : 'متاح',
+            'location': map['location']?.toString() ??
+                _composeLocation(map,
+                    city: map['city'], country: map['country']),
+            'price': map['price']?.toString() ?? 'مجانا',
+            'photoUrl': map['image']?.toString() ?? '',
+            'photo': 'stadiumImg',
+            'type': 'activity',
+          };
+        })
+        .where((m) => m['id'] != '')
+        .toList();
   }
 
   List<Map<String, dynamic>> _mapStadiums(List<dynamic>? data) {
     if (data == null) return [];
-    return data.map<Map<String, dynamic>>((item) {
-      final Map<String, dynamic> map =
-          item is Map<String, dynamic> ? item : {};
-      final Map<String, dynamic> meta = map['meta'] is Map<String, dynamic>
-          ? map['meta'] as Map<String, dynamic>
-          : {};
-      final sports = map['sports'] is List ? map['sports'] as List : [];
-      final firstSport =
-          sports.isNotEmpty && sports.first is Map<String, dynamic>
-              ? sports.first as Map<String, dynamic>
+    return data
+        .map<Map<String, dynamic>>((item) {
+          final Map<String, dynamic> map =
+              item is Map<String, dynamic> ? item : {};
+          final Map<String, dynamic> meta = map['meta'] is Map<String, dynamic>
+              ? map['meta'] as Map<String, dynamic>
               : {};
-      final price = firstSport['hour_price'] ??
-          map['hour_price'] ??
-          map['price'] ??
-          meta['hour_price'];
-      return {
-        'id': map['id']?.toString() ?? '',
-        'name': map['name']?.toString() ?? 'الملعب',
-        'location':
-            _composeLocation(map, city: map['city'], country: map['country']),
-        'price': price?.toString() ?? '0',
-        'size': meta['size']?.toString() ?? 'غير محدد',
-        'imageUrl': map['image']?.toString() ??
-            (map['images'] is List && map['images'].isNotEmpty
-                ? map['images'][0].toString()
-                : ''),
-        'image': 'stadiumImg',
-        'sportIds': sports
-            .map((e) => e is Map<String, dynamic>
-                ? e['sport_id'] ?? e['id']
-                : e)
-            .toList(),
-        'sportId': firstSport['sport_id'] ?? map['sport_id'],
-      };
-    }).where((m) => m['id'] != '').toList();
+          final sports = map['sports'] is List ? map['sports'] as List : [];
+          final firstSport =
+              sports.isNotEmpty && sports.first is Map<String, dynamic>
+                  ? sports.first as Map<String, dynamic>
+                  : {};
+          final price = firstSport['hour_price'] ??
+              map['hour_price'] ??
+              map['price'] ??
+              meta['hour_price'];
+          return {
+            'id': map['id']?.toString() ?? '',
+            'name': map['name']?.toString() ?? 'الملعب',
+            'location': _composeLocation(map,
+                city: map['city'], country: map['country']),
+            'price': price?.toString() ?? '0',
+            'size': meta['size']?.toString() ?? 'غير محدد',
+            'imageUrl': map['image']?.toString() ??
+                (map['images'] is List && map['images'].isNotEmpty
+                    ? map['images'][0].toString()
+                    : ''),
+            'image': 'stadiumImg',
+            'sportIds': sports
+                .map((e) =>
+                    e is Map<String, dynamic> ? e['sport_id'] ?? e['id'] : e)
+                .toList(),
+            'sportId': firstSport['sport_id'] ?? map['sport_id'],
+          };
+        })
+        .where((m) => m['id'] != '')
+        .toList();
   }
 
   List<Map<String, dynamic>> _mapCoaches(List<dynamic>? data) {
@@ -702,6 +1166,9 @@ class AppGet extends GetxController {
       final Map<String, dynamic> map = data[index] is Map<String, dynamic>
           ? data[index] as Map<String, dynamic>
           : {};
+      final sports = map['sports'] is List
+          ? List<dynamic>.from(map['sports'] as List)
+          : (map['sport_ids'] is List ? List<dynamic>.from(map['sport_ids']) : []);
       return {
         'id': map['id']?.toString() ?? '',
         'image': avatars[index % avatars.length],
@@ -714,6 +1181,10 @@ class AppGet extends GetxController {
         'type': map['type']?.toString() ?? 'مدرب شخصي',
         'description': map['description']?.toString() ?? '',
         'sportId': map['sport_id'] ?? map['sportId'],
+        'sportIds': sports
+            .map((e) =>
+                e is Map<String, dynamic> ? e['id'] ?? e['sport_id'] : e)
+            .toList(),
       };
     }).where((c) => c['id'] != '').toList();
   }
@@ -764,30 +1235,85 @@ class AppGet extends GetxController {
       if (countries.isNotEmpty) {
         selectedDialCode = countries.first['dialCode'] ?? selectedDialCode;
         selectedCountryName = countries.first['name'] ?? selectedCountryName;
+        selectedCountryId = countries.first['id'] ?? selectedCountryId;
       }
-      update(['SignIn', 'SignUp']);
+      update(['SignIn', 'SignUp', 'ProfileUpdate']);
     }
   }
 
-  void selectCountry(String dialCode, String name) {
+  Future<void> fetchCitiesForCountry(String countryId) async {
+    if (countryId.isEmpty) return;
+    if (citiesCountryId == countryId && cities.isNotEmpty) {
+      update(['ProfileUpdate', 'SignUp']);
+      return;
+    }
+    final res = await apiRepository.getCitiesByCountry(countryId);
+    if (res.success && res.data != null) {
+      cities = _mapCities(res.data!);
+      citiesCountryId = countryId;
+      // auto select user's city if it exists in the list
+      if (userCityId != null) {
+        final match =
+            cities.firstWhere((c) => c['id'] == userCityId, orElse: () => {});
+        if (match.isNotEmpty) {
+          selectedCityId = match['id'];
+          selectedCityName = match['name'];
+        }
+      }
+      update(['ProfileUpdate', 'SignUp']);
+    }
+  }
+
+  void selectCity(String? cityId, String? cityName) {
+    selectedCityId = cityId;
+    selectedCityName = cityName ?? selectedCityName;
+    update(['ProfileUpdate', 'SignUp']);
+  }
+
+  void selectCountry(String dialCode, String name, {String? id}) {
     selectedDialCode = dialCode;
     selectedCountryName = name;
-    update(['SignIn', 'SignUp']);
+    if (selectedCountryId != id) {
+      selectedCityId = null;
+      selectedCityName = null;
+      cities = [];
+      citiesCountryId = null;
+    }
+    selectedCountryId = id ?? selectedCountryId;
+    update(['SignIn', 'SignUp', 'ProfileUpdate']);
   }
 
   List<Map<String, String>> _mapCountries(List<dynamic> data) {
-    return data.map<Map<String, String>>((item) {
-      final map = item is Map<String, dynamic> ? item : {};
-      final dialCode = map['phone_code'] ??
-          map['dial_code'] ??
-          map['calling_code'] ??
-          map['code'];
-      return {
-        'id': map['id']?.toString() ?? '',
-        'name': map['name']?.toString() ?? '',
-        'dialCode': dialCode != null ? '+${dialCode.toString().replaceAll('+', '')}' : '',
-      };
-    }).where((c) => (c['dialCode'] ?? '').isNotEmpty).toList();
+    return data
+        .map<Map<String, String>>((item) {
+          final map = item is Map<String, dynamic> ? item : {};
+          final dialCode = map['phone_code'] ??
+              map['dial_code'] ??
+              map['calling_code'] ??
+              map['code'];
+          return {
+            'id': map['id']?.toString() ?? '',
+            'name': map['name']?.toString() ?? '',
+            'dialCode': dialCode != null
+                ? '+${dialCode.toString().replaceAll('+', '')}'
+                : '',
+          };
+        })
+        .where((c) => (c['dialCode'] ?? '').isNotEmpty)
+        .toList();
+  }
+
+  List<Map<String, String>> _mapCities(List<dynamic> data) {
+    return data
+        .map<Map<String, String>>((item) {
+          final map = item is Map<String, dynamic> ? item : {};
+          return {
+            'id': map['id']?.toString() ?? '',
+            'name': map['name']?.toString() ?? '',
+          };
+        })
+        .where((c) => (c['id'] ?? '').isNotEmpty)
+        .toList();
   }
 
   String _formatMobile(String raw) {
@@ -795,9 +1321,8 @@ class AppGet extends GetxController {
     if (cleaned.startsWith('0')) {
       cleaned = cleaned.substring(1);
     }
-    final dial = selectedDialCode.isNotEmpty
-        ? selectedDialCode.replaceAll('+', '')
-        : '';
+    final dial =
+        selectedDialCode.isNotEmpty ? selectedDialCode.replaceAll('+', '') : '';
     return '+$dial$cleaned';
   }
 }

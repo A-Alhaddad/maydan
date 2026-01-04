@@ -7,13 +7,17 @@ class ApiResult<T> {
   final T? data;
   final String? message;
   final int? statusCode;
+  final String? mobile;
 
   const ApiResult({
     required this.success,
     this.data,
     this.message,
     this.statusCode,
+    this.mobile,
   });
+
+  void operator [](String other) {}
 }
 
 class ApiService {
@@ -29,7 +33,7 @@ class ApiService {
     'Content-Type': 'application/json',
   };
 
-  String _baseHost = 'http://ec2-100-27-245-250.compute-1.amazonaws.com';
+  String _baseHost = 'http://192.168.0.3/maydan/index.php';
   String _authToken = '';
   late Dio _dio;
 
@@ -47,9 +51,10 @@ class ApiService {
   Future<ApiResult<T>> request<T>({
     required String path,
     String method = 'GET',
-    Map<String, dynamic>? data,
+    dynamic data,
     Map<String, dynamic>? query,
     bool auth = false,
+    bool multipart = false,
     T Function(dynamic data)? decoder,
   }) async {
     try {
@@ -59,7 +64,10 @@ class ApiService {
         queryParameters: query,
         options: Options(
           method: method,
-          headers: _buildHeaders(auth: auth),
+          headers: _buildHeaders(
+            auth: auth,
+            multipart: multipart || data is FormData,
+          ),
         ),
       );
 
@@ -99,9 +107,13 @@ class ApiService {
     );
   }
 
-  Map<String, String> _buildHeaders({bool auth = false}) {
+  Map<String, String> _buildHeaders(
+      {bool auth = false, bool multipart = false}) {
     final headers = <String, String>{};
     headers.addAll(_defaultHeaders);
+    if (multipart) {
+      headers['Content-Type'] = 'multipart/form-data';
+    }
     headers['Accept-Language'] = _prefs.getLanguageCode;
 
     final token = _authToken.isNotEmpty ? _authToken : _prefs.getTokenUser;
