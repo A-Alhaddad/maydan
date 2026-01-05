@@ -271,9 +271,11 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     await controller.fetchUserProfile(silent: true);
     Get.back();
     Get.snackbar(
-      'تم',
-      'تم تحديث بياناتك',
-      backgroundColor: Colors.black.withOpacity(0.6),
+      '',
+      '',
+      titleText: CustomText('عملية ناجحة', color: Colors.black,fontWeight: FontWeight.bold,),
+      messageText: CustomText('تم تحديث بياناتك', color: Colors.black,fontWeight: FontWeight.normal,),
+      backgroundColor:AppColors.green,
       colorText: Colors.white,
       snackPosition: SnackPosition.BOTTOM,
       margin: EdgeInsets.all(16.w),
@@ -332,8 +334,10 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                 Get.snackbar(
                   'تم',
                   'تم تأكيد رقم الهاتف',
-                  backgroundColor: Colors.black.withOpacity(0.6),
-                  colorText: Colors.white,
+                  backgroundColor: AppColors.green,
+                  titleText: CustomText('عملية ناجحة', color: Colors.black,fontWeight: FontWeight.bold,),
+                  messageText: CustomText('تم تأكيد رقم الهاتف', color: Colors.black,fontWeight: FontWeight.normal,),
+                  colorText: AppColors.black,
                   snackPosition: SnackPosition.BOTTOM,
                   margin: EdgeInsets.all(16.w),
                 );

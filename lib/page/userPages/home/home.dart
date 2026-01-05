@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:maydan/page/userPages/home/shimmer.dart';
 import 'package:maydan/widgets/my_library.dart';
 
@@ -28,7 +30,7 @@ class Home extends StatelessWidget {
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
-                SliverToBoxAdapter(child: SizedBox(height: 10.h)),
+                SliverToBoxAdapter(child: SizedBox(height: 30.h)),
                 SliverToBoxAdapter(child: _buildHeader(controller)),
                 SliverToBoxAdapter(child: SizedBox(height: 24.h)),
                 SliverToBoxAdapter(child: _buildLastMatchCard()),
@@ -57,7 +59,7 @@ class Home extends StatelessWidget {
                 SliverToBoxAdapter(child: _buildReservedStadiumsSection()),
                 SliverToBoxAdapter(child: SizedBox(height: 24.h)),
                 SliverToBoxAdapter(child: _buildCoachesSection()),
-                SliverToBoxAdapter(child: SizedBox(height: 100.h)),
+                SliverToBoxAdapter(child: SizedBox(height: 120.h)),
               ],
             ),
           ),
@@ -80,7 +82,7 @@ class Home extends StatelessWidget {
             children: [
               CustomText(
                 "${'homeHello'.tr} $userName",
-                fontSize: 14.sp,
+                fontSize: 16.sp,
                 color: Colors.white,
               ),
               SizedBox(height: 15.h),
@@ -257,7 +259,7 @@ class Home extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: 140.h,
+          height: 145.h,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: AppGet.to.matches.length,
@@ -288,9 +290,9 @@ class Home extends StatelessWidget {
   Widget _matchCard(Map<String, dynamic> match) {
     final photoUrl = match["photoUrl"] ?? "";
     return Container(
-      width: 330.w,
+      width: 350.w,
       constraints: BoxConstraints(minHeight: 150.h),
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.symmetric(vertical: 10.w ,horizontal: 10.w),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.06),
         borderRadius: BorderRadius.circular(26.r),
@@ -301,7 +303,7 @@ class Home extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(22.r),
             child: SizedBox(
-              width: 110.w,
+              width: 100.w,
               height: 100.h,
               child: photoUrl.isNotEmpty
                   ? CustomPngImageNetwork(
@@ -314,7 +316,7 @@ class Home extends StatelessWidget {
                     ),
             ),
           ),
-          SizedBox(width: 14.w),
+          SizedBox(width: 10.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,6 +399,7 @@ class Home extends StatelessWidget {
                     ),
                   ],
                 ),
+                // SizedBox(height: 2.h,)
               ],
             ),
           ),
@@ -486,6 +489,8 @@ class Home extends StatelessWidget {
 
   Widget _stadiumCard(Map<String, dynamic> stadium) {
     final imageUrl = stadium["imageUrl"] ?? "";
+    // final location = stadium['location'];
+    // printLog(location);
     return Container(
       width: 340.w,
       decoration: BoxDecoration(
@@ -549,11 +554,13 @@ class Home extends StatelessWidget {
                                 color: AppColors.green,
                               ),
                               SizedBox(width: 6.w),
-                              CustomText(
-                                stadium["location"] ?? "",
-                                fontSize: 14.sp,
-                                color: Colors.white,
-                                maxLines: 1,
+                              Flexible(
+                                child: CustomText(
+                                  stadium["location"].toString() ?? "",
+                                  fontSize: 14.sp,
+                                  color: Colors.white,
+                                  maxLines: 1,
+                                ),
                               ),
                             ],
                           ),
@@ -576,10 +583,11 @@ class Home extends StatelessWidget {
                         ],
                       ),
                     ),
+                    SizedBox(width: 5.w,),
                     Row(
                       children: [
                         Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             CustomText(
                               stadium["price"] ?? "",
