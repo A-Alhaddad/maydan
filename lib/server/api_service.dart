@@ -33,7 +33,9 @@ class ApiService {
     'Content-Type': 'application/json',
   };
 
-  String _baseHost = 'http://192.168.0.3/maydan/index.php';
+  // String _baseHost = 'http://192.168.0.3/maydan/index.php';
+  String _baseHost = 'https://maydan.alruqeishi-group.com';
+
   String _authToken = '';
   late Dio _dio;
 

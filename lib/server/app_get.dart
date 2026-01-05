@@ -31,7 +31,8 @@ class AppGet extends GetxController {
   int selectedServiceIndex = 0;
   int selectedSportTapIndex = 0;
   int selectedMatchTypeIndex = 0;
-  String urlWebApp = 'http://192.168.0.3/maydan/index.php';
+  // String urlWebApp = 'http://192.168.0.3/maydan/index.php';
+  String urlWebApp = 'https://maydan.alruqeishi-group.com';
   Widget? widgetHome;
   bool isHomeUserLoading = true;
   List<Map<String, dynamic>> sportsList = [];

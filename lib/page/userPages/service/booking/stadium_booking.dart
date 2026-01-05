@@ -36,21 +36,22 @@ class StadiumBooking extends StatelessWidget {
 
   int selectedDayIndex = -1;
   Set<int> selectedTimeIndices = {};
-  Map<String, dynamic> selectStadium = {};
+  // Map<String, dynamic> selectStadium = {};
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder(
+    return GetBuilder<AppGet>(
       id: 'StadiumBooking',
       builder: (controller) {
+        printLog(controller.selectStadium);
         return Column(
           // padding: EdgeInsets.zero,
           // shrinkWrap: true,
           children: [
             MatchTypeTabs(
-              items: AppGet.to.matchTypesList,
-              selectedIndex: AppGet.to.selectedMatchTypeIndex,
-              onTap: AppGet.to.changeMatchType,
+              items: controller.matchTypesList,
+              selectedIndex: controller.selectedMatchTypeIndex,
+              onTap: controller.changeMatchType,
             ),
             SizedBox(height: 20.h),
             SectionHeader(
@@ -72,7 +73,7 @@ class StadiumBooking extends StatelessWidget {
                   return GestureDetector(
                     onTap: () {
                       selectedDayIndex = index;
-                      AppGet.to.updateScreen(nameScreen: ['StadiumBooking']);
+                      controller.updateScreen(nameScreen: ['StadiumBooking']);
                     },
                     child: Container(
                       width: 80.w,
@@ -147,12 +148,12 @@ class StadiumBooking extends StatelessWidget {
                       } else {
                         selectedTimeIndices.add(index);
                       }
-                      AppGet.to.updateScreen(nameScreen: ['StadiumBooking']);
+                      controller.updateScreen(nameScreen: ['StadiumBooking']);
                     });
               },
             ),
             SizedBox(height: 20.h),
-            if (AppGet.to.selectStadium.isEmpty)
+            if (controller.selectStadium.isEmpty)
               Container(
                 width: double.infinity,
                 height: 250.h,
@@ -164,17 +165,17 @@ class StadiumBooking extends StatelessWidget {
                   boxFit: BoxFit.fill,
                 ),
               ),
-            if (AppGet.to.selectStadium.isEmpty)
+            if (controller.selectStadium.isEmpty)
               SizedBox(
                 height: 25.h,
               ),
-            if (AppGet.to.selectStadium.isEmpty)
+            if (controller.selectStadium.isEmpty)
               SectionHeader(
                 iconName: "icon15",
                 title: "availableStadiums".tr,
                 showMore: false,
               ),
-            if (AppGet.to.selectStadium.isEmpty)
+            if (controller.selectStadium.isEmpty)
               SizedBox(
                 height: 10.h,
               ),
@@ -185,17 +186,17 @@ class StadiumBooking extends StatelessWidget {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 // scrollDirection: Axis.horizontal,
-                itemCount: selected ? 1 : AppGet.to.stadiums.length,
+                itemCount: selected ? 1 : controller.stadiums.length,
                 itemBuilder: (context, index) {
                   final item = selected
-                      ? AppGet.to.selectStadium
-                      : AppGet.to.stadiums[index];
+                      ? controller.selectStadium
+                      : controller.stadiums[index];
                   final imageUrl = item['imageUrl'] ?? '';
                   return GestureDetector(
                     onTap: () {
                       if (!selected) {
-                        selectStadium = item;
-                        AppGet.to.updateScreen(nameScreen: ['StadiumBooking']);
+                        controller.selectStadium = item;
+                        controller.updateScreen(nameScreen: ['StadiumBooking']);
                       }
                     },
                     child: Container(
@@ -207,10 +208,10 @@ class StadiumBooking extends StatelessWidget {
                           borderRadius: BorderRadius.circular(26.r),
                           border: Border.all(
                               color: selected
-                                  ? AppGet.to.selectStadium['id'] == item['id']
+                                  ? controller.selectStadium['id'] == item['id']
                                       ? AppColors.green
                                       : Colors.transparent
-                                  : selectStadium['id'] == item['id']
+                                  : controller.selectStadium['id'] == item['id']
                                       ? AppColors.green
                                       : Colors.transparent)),
                       child: Row(
@@ -242,7 +243,7 @@ class StadiumBooking extends StatelessWidget {
                                   textAlign: TextAlign.start,
                                 ),
                                 SizedBox(
-                                  height: 40.h,
+                                  height: 20.h,
                                 ),
                                 Row(
                                   children: [
@@ -260,7 +261,8 @@ class StadiumBooking extends StatelessWidget {
                                               ),
                                               SizedBox(width: 6.w),
                                               CustomText(
-                                                item["location"] ?? "",
+                                                // 'item["location"]' ?? "",
+                                                'شارع المدينة',
                                                 fontSize: 14.sp,
                                                 color: Colors.white,
                                               ),
@@ -327,14 +329,14 @@ class StadiumBooking extends StatelessWidget {
                 Get.to(
                       () => MatchReservationPage(
                     matchId: selected
-                        ? AppGet.to.selectStadium['id']
-                        : selectStadium['id']
+                        ? controller.selectStadium['id']
+                        : controller.selectStadium['id']
                    ,newBooking: true,),
                 );
               },
             ),
             SizedBox(
-              height: 20.h,
+              height: 140.h,
             ),
           ],
         );
