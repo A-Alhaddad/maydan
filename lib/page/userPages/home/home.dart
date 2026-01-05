@@ -292,7 +292,7 @@ class Home extends StatelessWidget {
     return Container(
       width: 350.w,
       constraints: BoxConstraints(minHeight: 150.h),
-      padding: EdgeInsets.symmetric(vertical: 10.w ,horizontal: 10.w),
+      padding: EdgeInsets.symmetric(vertical: 10.w, horizontal: 10.w),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.06),
         borderRadius: BorderRadius.circular(26.r),
@@ -583,7 +583,9 @@ class Home extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(width: 5.w,),
+                    SizedBox(
+                      width: 5.w,
+                    ),
                     Row(
                       children: [
                         Column(
