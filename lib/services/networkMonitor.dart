@@ -10,19 +10,28 @@ class NetworkMonitor {
   final StreamController<bool> _connectionStreamController = StreamController<bool>.broadcast();
   Stream<bool> get connectionStream => _connectionStreamController.stream;
 
-  late StreamSubscription _subscription;
+  StreamSubscription<ConnectivityResult>? _subscription;
 
   void startMonitoring() {
-    _subscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) async {
-      bool hasInternet = await InternetConnectionChecker().hasConnection;
-      _connectionStreamController.add(hasInternet);
-    });
+    // إذا كان الاشتراك مفعلاً مسبقاً لا تعاود الاشتراك
+    if (_subscription != null) return;
+    _subscription = Connectivity().onConnectivityChanged.listen(
+      (ConnectivityResult result) async {
+        final hasInternet = await InternetConnectionChecker().hasConnection;
+        if (!_connectionStreamController.isClosed) {
+          _connectionStreamController.add(hasInternet);
+        }
+      },
+    );
   }
   Future<bool> checkInternetOnce() async {
     return await InternetConnectionChecker().hasConnection;
   }
   void dispose() {
-    _subscription.cancel();
-    _connectionStreamController.close();
+    _subscription?.cancel();
+    _subscription = null;
+    if (!_connectionStreamController.isClosed) {
+      _connectionStreamController.close();
+    }
   }
 }

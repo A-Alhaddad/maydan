@@ -836,7 +836,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"MAYDAN Arena\",\n  \"description\": \"Main football stadium\",\n  \"country_id\": 1,\n  \"city_id\": 2,\n  \"address\": \"Ilidza Center\",\n  \"lat\": 43.828,\n  \"lng\": 18.308,\n  \"amenities\": [\n    \"parking\",\n    \"lights\",\n    \"locker_rooms\"\n  ],\n  \"sports\": [\n    {\n      \"sport_id\": 1,\n      \"hour_price\": 50,\n      \"meta\": {\n        \"peak_hours_price\": 70\n      }\n    }\n  ]\n}",
+              "raw": "{\n  \"name\": \"MAYDAN Arena\",\n  \"description\": \"Main football stadium\",\n  \"country_id\": 1,\n  \"city_id\": 2,\n  \"address\": \"Ilidza Center\",\n  \"lat\": 43.828,\n  \"lng\": 18.308,\n  \"amenities\": [\n    \"parking\",\n    \"lights\",\n    \"locker_rooms\"\n  ],\n  \"images\": [1, 2],\n  \"sports\": [\n    {\n      \"sport_id\": 1,\n      \"hour_price\": 50,\n      \"meta\": {\n        \"peak_hours_price\": 70\n      }\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"

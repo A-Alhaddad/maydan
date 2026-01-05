@@ -31,7 +31,7 @@ class AppGet extends GetxController {
   int selectedServiceIndex = 0;
   int selectedSportTapIndex = 0;
   int selectedMatchTypeIndex = 0;
-  String urlWebApp = 'https://maydan.alruqeishi-group.com';
+  String urlWebApp = 'http://192.168.0.3/maydan/index.php';
   Widget? widgetHome;
   bool isHomeUserLoading = true;
   List<Map<String, dynamic>> sportsList = [];
@@ -1015,7 +1015,8 @@ class AppGet extends GetxController {
     return int.tryParse(id.toString()) ?? id as int?;
   }
 
-  Future<void> _loadDataForSport(int? sportId, {bool showPageLoader = false}) async {
+  Future<void> _loadDataForSport(int? sportId,
+      {bool showPageLoader = false}) async {
     final cacheKey = sportId;
 
     // استخدم الكاش إذا كان متوفر
@@ -1142,6 +1143,8 @@ class AppGet extends GetxController {
               reservable['data'] is Map<String, dynamic>
                   ? reservable['data'] as Map<String, dynamic>
                   : <String, dynamic>{};
+          final List<dynamic> reservableImages =
+              reservableData['images'] is List ? reservableData['images'] : [];
           final sportId = map['sport_id'] ?? map['sportId'] ?? sport['id'];
           final startAt = map['start_at']?.toString() ??
               map['startAt']?.toString() ??
@@ -1152,8 +1155,7 @@ class AppGet extends GetxController {
               map['available'] ??
               map['slots'] ??
               map['max_slots'];
-          final city =
-              stadium['city'] ?? reservableData['city'] ?? map['city'];
+          final city = stadium['city'] ?? reservableData['city'] ?? map['city'];
           final country =
               stadium['country'] ?? reservableData['country'] ?? map['country'];
           return {
@@ -1170,9 +1172,12 @@ class AppGet extends GetxController {
                 stadium['hour_price']?.toString() ??
                 'مجانا',
             'photoUrl': stadium['image']?.toString() ??
-                (stadium['images'] is List && stadium['images'].isNotEmpty
-                    ? stadium['images'][0].toString()
-                    : sport['image']?.toString() ?? ''),
+                (reservableImages.isNotEmpty
+                    ? reservableImages.first.toString()
+                    : (stadium['images'] is List &&
+                            (stadium['images'] as List).isNotEmpty
+                        ? stadium['images'][0].toString()
+                        : sport['image']?.toString() ?? '')),
             'photo': 'stadiumImg',
             'type': type,
             'sportId': sportId,
@@ -1270,7 +1275,9 @@ class AppGet extends GetxController {
           : {};
       final sports = map['sports'] is List
           ? List<dynamic>.from(map['sports'] as List)
-          : (map['sport_ids'] is List ? List<dynamic>.from(map['sport_ids']) : []);
+          : (map['sport_ids'] is List
+              ? List<dynamic>.from(map['sport_ids'])
+              : []);
       return {
         'id': map['id']?.toString() ?? '',
         'image': avatars[index % avatars.length],
@@ -1284,8 +1291,8 @@ class AppGet extends GetxController {
         'description': map['description']?.toString() ?? '',
         'sportId': map['sport_id'] ?? map['sportId'],
         'sportIds': sports
-            .map((e) =>
-                e is Map<String, dynamic> ? e['id'] ?? e['sport_id'] : e)
+            .map(
+                (e) => e is Map<String, dynamic> ? e['id'] ?? e['sport_id'] : e)
             .toList(),
       };
     }).where((c) => c['id'] != '').toList();
@@ -1428,7 +1435,6 @@ class AppGet extends GetxController {
     return '+$dial$cleaned';
   }
 
-
   int addedItemsTabIndex = 0;
   int addedItemsCategoryIndex = 0;
 
@@ -1440,10 +1446,12 @@ class AppGet extends GetxController {
     addedItemsTabIndex = i;
     update(['AddedItemsPage']);
   }
+
   void changeAddedItemsCategory(int i) {
     addedItemsCategoryIndex = i;
     update(['AddedItemsPage']);
   }
+
   void openEditProduct(dynamic id) {}
   void openProductDetails(dynamic id) {}
 }

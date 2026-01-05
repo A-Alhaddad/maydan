@@ -26,6 +26,10 @@ dependencies:
   connectivity_plus: ^5.0.1
   internet_connection_checker: ^1.0.0+1
 
+dependency_overrides:
+  # تثبيت نسخة متوافقة مع SDK الحالي (تجنب UnmodifiableUint8ListView)
+  win32: 4.1.4
+
 dev_dependencies:
   flutter_launcher_icons: ^0.14.1
   flutter_test:
