@@ -557,7 +557,7 @@ class Home extends StatelessWidget {
                               Flexible(
                                 child: CustomText(
                                   // stadium["location"] ?? "",
-                                  'شارع المدينة',
+                                  'شارع المدينة', 
                                   fontSize: 14.sp,
                                   color: Colors.white,
                                   maxLines: 2,

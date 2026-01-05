@@ -237,6 +237,7 @@ class StadiumBooking extends StatelessWidget {
                               children: [
                                 CustomText(
                                   item["name"] ?? "",
+                                  maxLines: 1,
                                   fontSize: 18.sp,
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
