@@ -40,7 +40,8 @@ class _OTPState extends State<OTP> {
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   physics: const BouncingScrollPhysics(),
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints:
+                        BoxConstraints(minHeight: constraints.maxHeight),
                     child: IntrinsicHeight(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,8 +83,13 @@ class _OTPState extends State<OTP> {
                               ),
                               SizedBox(width: 6.w),
                               GestureDetector(
-                                onTap: () {
-                                  printLog('ReSend Code');
+                                onTap: () async {
+                                  FocusScope.of(context).unfocus();
+                                  await controller.loginWithPhone(
+                                    mobile: widget.phone,
+                                    context: context,
+                                    goToReset: widget.goToPasswordReset,
+                                  );
                                 },
                                 child: CustomText(
                                   "resend".tr,
@@ -94,9 +100,7 @@ class _OTPState extends State<OTP> {
                               ),
                             ],
                           ),
-
                           SizedBox(height: 20.h),
-
                           if (controller.otpErrorMessage?.isNotEmpty == true)
                             Padding(
                               padding: EdgeInsetsDirectional.only(top: 5.h),
@@ -119,7 +123,6 @@ class _OTPState extends State<OTP> {
                                 ),
                               ),
                             ),
-
                           const Spacer(),
                           CustomMainButton(
                             title: "verifyBtn",

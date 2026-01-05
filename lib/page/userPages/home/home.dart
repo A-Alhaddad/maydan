@@ -556,10 +556,11 @@ class Home extends StatelessWidget {
                               SizedBox(width: 6.w),
                               Flexible(
                                 child: CustomText(
-                                  stadium["location"].toString() ?? "",
+                                  stadium["location"] ?? "",
                                   fontSize: 14.sp,
                                   color: Colors.white,
-                                  maxLines: 1,
+                                  maxLines: 2,
+                                  textAlign: TextAlign.start,
                                 ),
                               ),
                             ],
