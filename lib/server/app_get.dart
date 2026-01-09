@@ -1246,7 +1246,8 @@ class AppGet extends GetxController {
               firstSport['size'] ??
               firstSport['area'] ??
               (map['meta'] is Map<String, dynamic>
-                  ? ((map['meta'] as Map)['size'] ?? (map['meta'] as Map)['area'])
+                  ? ((map['meta'] as Map)['size'] ??
+                      (map['meta'] as Map)['area'])
                   : null);
           return {
             'id': map['id']?.toString() ?? '',

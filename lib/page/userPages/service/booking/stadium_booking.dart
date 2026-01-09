@@ -36,7 +36,7 @@ class StadiumBooking extends StatelessWidget {
 
   int selectedDayIndex = -1;
   Set<int> selectedTimeIndices = {};
-  Map<String, dynamic> selectStadium = {};
+  // Map<String, dynamic> selectStadium = {};
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +50,9 @@ class StadiumBooking extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             MatchTypeTabs(
-              items: AppGet.to.matchTypesList,
-              selectedIndex: AppGet.to.selectedMatchTypeIndex,
-              onTap: AppGet.to.changeMatchType,
+              items: controller.matchTypesList,
+              selectedIndex: controller.selectedMatchTypeIndex,
+              onTap: controller.changeMatchType,
             ),
             SizedBox(height: 20.h),
             SectionHeader(
@@ -74,7 +74,7 @@ class StadiumBooking extends StatelessWidget {
                   return GestureDetector(
                     onTap: () {
                       selectedDayIndex = index;
-                      AppGet.to.updateScreen(nameScreen: ['StadiumBooking']);
+                      controller.updateScreen(nameScreen: ['StadiumBooking']);
                     },
                     child: Container(
                       width: 80.w,
@@ -149,12 +149,12 @@ class StadiumBooking extends StatelessWidget {
                       } else {
                         selectedTimeIndices.add(index);
                       }
-                      AppGet.to.updateScreen(nameScreen: ['StadiumBooking']);
+                      controller.updateScreen(nameScreen: ['StadiumBooking']);
                     });
               },
             ),
             SizedBox(height: 20.h),
-            if (AppGet.to.selectStadium.isEmpty)
+            if (controller.selectStadium.isEmpty)
               Container(
                 width: double.infinity,
                 height: 250.h,
@@ -166,17 +166,17 @@ class StadiumBooking extends StatelessWidget {
                   boxFit: BoxFit.fill,
                 ),
               ),
-            if (AppGet.to.selectStadium.isEmpty)
+            if (controller.selectStadium.isEmpty)
               SizedBox(
                 height: 25.h,
               ),
-            if (AppGet.to.selectStadium.isEmpty)
+            if (controller.selectStadium.isEmpty)
               SectionHeader(
                 iconName: "icon15",
                 title: "availableStadiums".tr,
                 showMore: false,
               ),
-            if (AppGet.to.selectStadium.isEmpty)
+            if (controller.selectStadium.isEmpty)
               SizedBox(
                 height: 10.h,
               ),
@@ -195,8 +195,8 @@ class StadiumBooking extends StatelessWidget {
                   return GestureDetector(
                     onTap: () {
                       if (!selected) {
-                        selectStadium = item;
-                        AppGet.to.updateScreen(nameScreen: ['StadiumBooking']);
+                        controller.selectStadium = item;
+                        controller.updateScreen(nameScreen: ['StadiumBooking']);
                       }
                     },
                     child: Container(
@@ -240,13 +240,14 @@ class StadiumBooking extends StatelessWidget {
                               children: [
                                 CustomText(
                                   item["name"] ?? "",
+                                  maxLines: 1,
                                   fontSize: 18.sp,
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
                                   textAlign: TextAlign.start,
                                 ),
                                 SizedBox(
-                                  height: 40.h,
+                                  height: 20.h,
                                 ),
                                 Row(
                                   children: [
@@ -264,7 +265,8 @@ class StadiumBooking extends StatelessWidget {
                                               ),
                                               SizedBox(width: 6.w),
                                               CustomText(
-                                                item["location"] ?? "",
+                                                // 'item["location"]' ?? "",
+                                                'شارع المدينة',
                                                 fontSize: 14.sp,
                                                 color: Colors.white,
                                               ),
