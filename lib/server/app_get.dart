@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart' as dio;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:maydan/page/login&regiester/SignIn.dart';
 import 'package:maydan/page/userPages/service/booking/stadium_booking.dart';
@@ -31,7 +32,8 @@ class AppGet extends GetxController {
   int selectedServiceIndex = 0;
   int selectedSportTapIndex = 0;
   int selectedMatchTypeIndex = 0;
-  String urlWebApp = 'http://192.168.0.3/maydan/index.php';
+  String urlWebApp =
+      dotenv.env['SERVER_URL'] ?? 'http://192.168.0.3/maydan/index.php';
   Widget? widgetHome;
   bool isHomeUserLoading = true;
   List<Map<String, dynamic>> sportsList = [];
@@ -1237,13 +1239,22 @@ class AppGet extends GetxController {
               map['hour_price'] ??
               map['price'] ??
               meta['hour_price'];
+          final sizeVal = meta['size'] ??
+              meta['area'] ??
+              map['size'] ??
+              map['area'] ??
+              firstSport['size'] ??
+              firstSport['area'] ??
+              (map['meta'] is Map<String, dynamic>
+                  ? ((map['meta'] as Map)['size'] ?? (map['meta'] as Map)['area'])
+                  : null);
           return {
             'id': map['id']?.toString() ?? '',
             'name': map['name']?.toString() ?? 'الملعب',
             'location': _composeLocation(map,
                 city: map['city'], country: map['country']),
             'price': price?.toString() ?? '0',
-            'size': meta['size']?.toString() ?? 'غير محدد',
+            'size': sizeVal?.toString() ?? 'غير محدد',
             'imageUrl': map['image']?.toString() ??
                 (map['images'] is List && map['images'].isNotEmpty
                     ? map['images'][0].toString()
@@ -1321,9 +1332,22 @@ class AppGet extends GetxController {
 
   String _composeLocation(Map<String, dynamic> map,
       {dynamic city, dynamic country}) {
-    final address = map['address'] ?? map['location'];
-    final cityVal = city ?? map['city'];
-    final countryVal = country ?? map['country'];
+    String? address;
+    dynamic cityVal = city;
+    dynamic countryVal = country;
+
+    // إذا كان الموقع كائنًا يحتوي على تفاصيل
+    if (map['location'] is Map) {
+      final loc = map['location'] as Map;
+      address = loc['address']?.toString();
+      cityVal ??= loc['city'];
+      countryVal ??= loc['country'];
+    }
+
+    address ??= map['address']?.toString();
+    cityVal ??= map['city'];
+    countryVal ??= map['country'];
+
     final parts = [
       if (address != null && '$address'.isNotEmpty) '$address',
       if (cityVal != null && '$cityVal'.isNotEmpty) '$cityVal',

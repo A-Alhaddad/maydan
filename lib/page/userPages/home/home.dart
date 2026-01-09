@@ -559,7 +559,7 @@ class Home extends StatelessWidget {
                                   stadium["location"] ?? "",
                                   fontSize: 14.sp,
                                   color: Colors.white,
-                                  maxLines: 2,
+                                  maxLines: 1,
                                   textAlign: TextAlign.start,
                                 ),
                               ),

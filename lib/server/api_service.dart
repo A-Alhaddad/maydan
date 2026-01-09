@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:maydan/services/preferences/app_preferences.dart';
 import 'package:maydan/value/constant.dart';
 
@@ -33,7 +34,8 @@ class ApiService {
     'Content-Type': 'application/json',
   };
 
-  String _baseHost = 'http://192.168.0.3/maydan/index.php';
+  String _baseHost =
+      dotenv.env['SERVER_URL'] ?? 'http://192.168.0.3/maydan/index.php';
   String _authToken = '';
   late Dio _dio;
 

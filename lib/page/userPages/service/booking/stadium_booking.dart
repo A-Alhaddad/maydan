@@ -40,12 +40,14 @@ class StadiumBooking extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder(
+    return GetBuilder<AppGet>(
       id: 'StadiumBooking',
       builder: (controller) {
+        final app = AppGet.to;
+        final List<Map<String, dynamic>> stadiumItems =
+            app.stadiums.isNotEmpty ? app.stadiums : const [];
         return Column(
-          // padding: EdgeInsets.zero,
-          // shrinkWrap: true,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             MatchTypeTabs(
               items: AppGet.to.matchTypesList,
@@ -185,11 +187,10 @@ class StadiumBooking extends StatelessWidget {
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 // scrollDirection: Axis.horizontal,
-                itemCount: selected ? 1 : AppGet.to.stadiums.length,
+                itemCount: selected ? 1 : stadiumItems.length,
                 itemBuilder: (context, index) {
-                  final item = selected
-                      ? AppGet.to.selectStadium
-                      : AppGet.to.stadiums[index];
+                  final item =
+                      selected ? AppGet.to.selectStadium : stadiumItems[index];
                   final imageUrl = item['imageUrl'] ?? '';
                   return GestureDetector(
                     onTap: () {
@@ -207,12 +208,15 @@ class StadiumBooking extends StatelessWidget {
                           borderRadius: BorderRadius.circular(26.r),
                           border: Border.all(
                               color: selected
-                                  ? AppGet.to.selectStadium['id'] == item['id']
+                                  ? (AppGet.to.selectStadium['id']
+                                              ?.toString() ==
+                                          item['id']?.toString()
                                       ? AppColors.green
-                                      : Colors.transparent
-                                  : selectStadium['id'] == item['id']
+                                      : Colors.transparent)
+                                  : (selectStadium['id']?.toString() ==
+                                          item['id']?.toString()
                                       ? AppColors.green
-                                      : Colors.transparent)),
+                                      : Colors.transparent))),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -325,17 +329,16 @@ class StadiumBooking extends StatelessWidget {
               title: "homeActionBook",
               onTap: () async {
                 Get.to(
-                      () => MatchReservationPage(
+                  () => MatchReservationPage(
                     matchId: selected
-                        ? AppGet.to.selectStadium['id']
-                        : selectStadium['id']
-                   ,newBooking: true,),
+                        ? (AppGet.to.selectStadium['id'] ?? selectStadium['id'])
+                        : selectStadium['id'],
+                    newBooking: true,
+                  ),
                 );
               },
             ),
-            SizedBox(
-              height: 20.h,
-            ),
+            SizedBox(height: 120.h)
           ],
         );
       },
