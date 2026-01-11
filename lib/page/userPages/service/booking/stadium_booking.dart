@@ -153,19 +153,19 @@ class StadiumBooking extends StatelessWidget {
                     });
               },
             ),
-            SizedBox(height: 20.h),
-            if (controller.selectStadium.isEmpty)
-              Container(
-                width: double.infinity,
-                height: 250.h,
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20.r))),
-                child: CustomPngImage(
-                  imageName: 'map3',
-                  boxFit: BoxFit.fill,
-                ),
-              ),
+            // SizedBox(height: 20.h),
+            // if (controller.selectStadium.isEmpty || controller.selectStadium.isNotEmpty)
+            //   Container(
+            //     width: double.infinity,
+            //     height: 250.h,
+            //     clipBehavior: Clip.antiAlias,
+            //     decoration: BoxDecoration(
+            //         borderRadius: BorderRadius.all(Radius.circular(20.r))),
+            //     child: CustomPngImage(
+            //       imageName: 'map3',
+            //       boxFit: BoxFit.fill,
+            //     ),
+            //   ),
             if (controller.selectStadium.isEmpty)
               SizedBox(
                 height: 25.h,
@@ -213,7 +213,7 @@ class StadiumBooking extends StatelessWidget {
                                           item['id']?.toString()
                                       ? AppColors.green
                                       : Colors.transparent)
-                                  : (selectStadium['id']?.toString() ==
+                                  : (AppGet.to.selectStadium['id']?.toString() ==
                                           item['id']?.toString()
                                       ? AppColors.green
                                       : Colors.transparent))),
@@ -264,11 +264,14 @@ class StadiumBooking extends StatelessWidget {
                                                 color: AppColors.green,
                                               ),
                                               SizedBox(width: 6.w),
-                                              CustomText(
-                                                // 'item["location"]' ?? "",
-                                                'شارع المدينة',
-                                                fontSize: 14.sp,
-                                                color: Colors.white,
+                                              Flexible(
+                                                child: CustomText(
+                                                  item["location"] ?? "",
+                                                  // 'شارع المدينة',
+                                                  fontSize: 14.sp,
+                                                  maxLines: 1,
+                                                  color: Colors.white,
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -333,8 +336,8 @@ class StadiumBooking extends StatelessWidget {
                 Get.to(
                   () => MatchReservationPage(
                     matchId: selected
-                        ? (AppGet.to.selectStadium['id'] ?? selectStadium['id'])
-                        : selectStadium['id'],
+                        ? (AppGet.to.selectStadium['id'] ?? AppGet.to.selectStadium['id'])
+                        : AppGet.to.selectStadium['id'],
                     newBooking: true,
                   ),
                 );

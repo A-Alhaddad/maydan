@@ -34,7 +34,7 @@ class Home extends StatelessWidget {
                 SliverToBoxAdapter(child: _buildHeader(controller)),
                 SliverToBoxAdapter(child: SizedBox(height: 24.h)),
                 SliverToBoxAdapter(child: _buildLastMatchCard()),
-                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                SliverToBoxAdapter(child: SizedBox(height: 15.h)),
                 SliverPersistentHeader(
                   pinned: true,
                   delegate: _SportsHeaderDelegate(
@@ -51,9 +51,9 @@ class Home extends StatelessWidget {
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-                SliverToBoxAdapter(child: _buildActionsRow()),
-                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                SliverToBoxAdapter(child: SizedBox(height: 15.h)),
+                // SliverToBoxAdapter(child: _buildActionsRow()),
+                // SliverToBoxAdapter(child: SizedBox(height: 24.h)),
                 SliverToBoxAdapter(child: _buildReservedMatchesSection()),
                 SliverToBoxAdapter(child: SizedBox(height: 24.h)),
                 SliverToBoxAdapter(child: _buildReservedStadiumsSection()),
@@ -110,6 +110,9 @@ class Home extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
+        AppPreferences().getStringValue(key: 'tokenUser').then((value) {
+          print(value);
+        },);
         printLog('احجز مجدداً');
       },
       child: Container(
@@ -489,8 +492,8 @@ class Home extends StatelessWidget {
 
   Widget _stadiumCard(Map<String, dynamic> stadium) {
     final imageUrl = stadium["imageUrl"] ?? "";
-    // final location = stadium['location'];
-    // printLog(location);
+    final location = stadium;
+    printLog(location);
     return Container(
       width: 340.w,
       decoration: BoxDecoration(
@@ -556,8 +559,8 @@ class Home extends StatelessWidget {
                               SizedBox(width: 6.w),
                               Flexible(
                                 child: CustomText(
-                                  // stadium["location"] ?? "",
-                                  'شارع المدينة', 
+                                  stadium["location"] ?? "",
+                                  // 'شارع المدينة',
                                   fontSize: 14.sp,
                                   color: Colors.white,
                                   maxLines: 1,
