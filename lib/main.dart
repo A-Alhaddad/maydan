@@ -40,6 +40,14 @@ class _MyAppState extends State<MyApp> {
       builder: (context, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            scaffoldBackgroundColor: AppColors.darkIndigo,
+            canvasColor: AppColors.darkIndigo,
+            dialogBackgroundColor: AppColors.darkIndigo,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: AppColors.darkIndigo,
+            ),
+          ),
           translations: MyTranslations(),
           builder: (context, widget) {
             final size = MediaQuery.of(context).size;
