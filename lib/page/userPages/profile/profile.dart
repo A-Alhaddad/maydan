@@ -1,5 +1,6 @@
 import 'package:maydan/page/userPages/profile/text_screen.dart';
 import 'package:maydan/page/userPages/profile/update_profile_page.dart';
+import 'package:maydan/page/userPages/service/booking/booking_details_page.dart';
 import 'package:maydan/widgets/my_library.dart';
 
 import '../../../widgets/notification_Button.dart';
@@ -141,6 +142,10 @@ class Profile extends StatelessWidget {
                 match: item,
                 typeList: "OldReservations",
               ),
+              onHeaderTap: () {
+                AppGet.to.changeBottomNavUser(indexBottomNav: 2);
+                Get.offAll(() => MainUserScreen());
+              },
             ));
         break;
       case "serviceGridCoaches2":
@@ -244,109 +249,123 @@ class PreviousBookingCard extends StatelessWidget {
     final price = match["price"]?.toString() ?? "";
 
     return typeList == 'OldReservations'
-        ? Container(
-            width: double.infinity,
-            height: 120.h,
-            padding: EdgeInsets.all(16.w),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.06),
-              borderRadius: BorderRadius.circular(26.r),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 90.h,
-                  width: 100.w,
-                  padding: EdgeInsets.all(22.h),
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle, color: AppColors.darkIndigo),
-                  child: CustomSvgImage(
-                    imageName: type == 'challenge'
-                        ? 'serviceMatchType2'
-                        : type == 'match'
-                            ? 'serviceMatchType1'
-                            : 'serviceMatchType3',
+        ? GestureDetector(
+            onTap: () {
+              final reservationId = match['reservation_id'] ??
+                  match['reservationId'] ??
+                  match['id'];
+              if (reservationId == null || reservationId.toString().isEmpty) {
+                getSheetError('تعذر العثور على رقم الحجز');
+                return;
+              }
+              Get.to(() => BookingDetailsPage(
+                    reservationId: reservationId.toString(),
+                  ));
+            },
+            child: Container(
+              width: double.infinity,
+              constraints: BoxConstraints(minHeight: 120.h),
+              padding: EdgeInsets.all(16.w),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.06),
+                borderRadius: BorderRadius.circular(26.r),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 90.h,
+                    width: 100.w,
+                    padding: EdgeInsets.all(22.h),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle, color: AppColors.darkIndigo),
+                    child: CustomSvgImage(
+                      imageName: type == 'challenge'
+                          ? 'serviceMatchType2'
+                          : type == 'match'
+                              ? 'serviceMatchType1'
+                              : 'serviceMatchType3',
+                    ),
                   ),
-                ),
-                SizedBox(width: 14.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CustomText(
-                        name ?? "",
-                        fontSize: 18.sp,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        textAlign: TextAlign.start,
-                      ),
-                      SizedBox(height: 12.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 28.w,
-                            height: 28.w,
-                            decoration: BoxDecoration(
+                  SizedBox(width: 14.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomText(
+                          name ?? "",
+                          fontSize: 18.sp,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          textAlign: TextAlign.start,
+                        ),
+                        SizedBox(height: 12.h),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 28.w,
+                              height: 28.w,
+                              decoration: BoxDecoration(
+                                color: AppColors.green,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.calendar_month,
+                                size: 16.sp,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(width: 6.w),
+                            CustomText(
+                              date ?? "",
+                              fontSize: 14.sp,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 14.w),
+                            Container(
+                              width: 28.w,
+                              height: 28.w,
+                              decoration: BoxDecoration(
+                                color: AppColors.green,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.access_time,
+                                size: 16.sp,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(width: 6.w),
+                            CustomText(
+                              time ?? "",
+                              fontSize: 14.sp,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10.h),
+                        Row(
+                          children: [
+                            CustomText(
+                              price ?? "",
+                              fontSize: 20.sp,
                               color: AppColors.green,
-                              shape: BoxShape.circle,
+                              fontWeight: FontWeight.w700,
                             ),
-                            child: Icon(
-                              Icons.calendar_month,
-                              size: 16.sp,
-                              color: Colors.black,
-                            ),
-                          ),
-                          SizedBox(width: 6.w),
-                          CustomText(
-                            date ?? "",
-                            fontSize: 14.sp,
-                            color: Colors.white,
-                          ),
-                          SizedBox(width: 14.w),
-                          Container(
-                            width: 28.w,
-                            height: 28.w,
-                            decoration: BoxDecoration(
-                              color: AppColors.green,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.access_time,
-                              size: 16.sp,
-                              color: Colors.black,
-                            ),
-                          ),
-                          SizedBox(width: 6.w),
-                          CustomText(
-                            time ?? "",
-                            fontSize: 14.sp,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10.h),
-                      Row(
-                        children: [
-                          CustomText(
-                            price ?? "",
-                            fontSize: 20.sp,
-                            color: AppColors.green,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ],
-                      )
-                    ],
+                          ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           )
         : typeList == 'Coaches'
             ? Container(
                 width: double.infinity,
-                height: 100.h,
+                constraints: BoxConstraints(minHeight: 100.h),
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.09),
@@ -405,7 +424,7 @@ class PreviousBookingCard extends StatelessWidget {
             : typeList == 'BankCards'
                 ? Container(
                     width: double.infinity,
-                    height: 100.h,
+                    constraints: BoxConstraints(minHeight: 100.h),
                     padding: EdgeInsets.all(16.w),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.09),

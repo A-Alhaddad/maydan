@@ -37,12 +37,14 @@ class Service extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: 18.h),
-                    SportsTabs(
-                      items: controller.sportsList,
-                      selectedIndex: controller.selectedSportTapIndex,
-                      isLoading: controller.isSportLoading,
-                      onTap: controller.changeSport,
-                    ),
+                    if (!(controller.selectedServiceIndex == 4 &&
+                        controller.selectStadium.isNotEmpty))
+                      SportsTabs(
+                        items: controller.sportsList,
+                        selectedIndex: controller.selectedSportTapIndex,
+                        isLoading: controller.isSportLoading,
+                        onTap: controller.changeSport,
+                      ),
                     SizedBox(height: 24.h),
                   ],
                 ),

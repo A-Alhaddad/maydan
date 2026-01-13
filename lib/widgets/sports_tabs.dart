@@ -129,8 +129,8 @@ class _SportsTabsState extends State<SportsTabs> {
                           child: Center(
                             child: CustomPngImageNetwork(
                               imageUrl: imageUrl,
-                              width: 26.w,
-                              height: 26.w,
+                              width: 30.w,
+                              height: 30.w,
                               boxFit: BoxFit.contain,
                             ),
                           ),
@@ -142,8 +142,8 @@ class _SportsTabsState extends State<SportsTabs> {
                           child: Center(
                             child: CustomPngImage(
                               imageName: imageName,
-                              width: 26.w,
-                              height: 26.w,
+                              width: 30.w,
+                              height: 30.w,
                               boxFit: BoxFit.contain,
                             ),
                           ),

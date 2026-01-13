@@ -51,6 +51,11 @@ class _MyAppState extends State<MyApp> {
               ),
               child: Stack(
                 children: [
+                  Container(
+                    width: size.width,
+                    height: size.height,
+                    color: const Color(0xFF000127),
+                  ),
                   CustomPngImage(
                     imageName: 'background',
                     width: size.width,

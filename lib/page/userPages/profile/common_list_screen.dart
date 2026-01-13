@@ -28,7 +28,14 @@ class CommonListPage extends StatelessWidget {
             Row(
               children: [
                 CustomBackButton(
-                  onTap: () => Get.back(),
+                  onTap: () {
+                    final canPop = Get.key.currentState?.canPop() ?? false;
+                    if (canPop) {
+                      Get.back();
+                      return;
+                    }
+                    onHeaderTap?.call();
+                  },
                 ),
                 Expanded(
                   child: Center(

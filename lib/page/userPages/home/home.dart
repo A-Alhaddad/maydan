@@ -5,6 +5,7 @@ import 'package:maydan/widgets/my_library.dart';
 
 import '../../../widgets/notification_Button.dart';
 import '../../../widgets/sports_tabs.dart';
+import '../stadium/stadium_details_page.dart';
 import '../service/coaches/coach_details_page.dart';
 import '../service/matches/match_reservation_page.dart';
 
@@ -34,7 +35,7 @@ class Home extends StatelessWidget {
                 SliverToBoxAdapter(child: _buildHeader(controller)),
                 SliverToBoxAdapter(child: SizedBox(height: 24.h)),
                 SliverToBoxAdapter(child: _buildLastMatchCard()),
-                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                SliverToBoxAdapter(child: SizedBox(height: 15.h)),
                 SliverPersistentHeader(
                   pinned: true,
                   delegate: _SportsHeaderDelegate(
@@ -51,9 +52,9 @@ class Home extends StatelessWidget {
                     ),
                   ),
                 ),
-                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-                SliverToBoxAdapter(child: _buildActionsRow()),
-                SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+                SliverToBoxAdapter(child: SizedBox(height: 15.h)),
+                // SliverToBoxAdapter(child: _buildActionsRow()),
+                // SliverToBoxAdapter(child: SizedBox(height: 24.h)),
                 SliverToBoxAdapter(child: _buildReservedMatchesSection()),
                 SliverToBoxAdapter(child: SizedBox(height: 24.h)),
                 SliverToBoxAdapter(child: _buildReservedStadiumsSection()),
@@ -110,6 +111,11 @@ class Home extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
+        AppPreferences().getStringValue(key: 'tokenUser').then(
+          (value) {
+            print(value);
+          },
+        );
         printLog('احجز مجدداً');
       },
       child: Container(
@@ -289,6 +295,12 @@ class Home extends StatelessWidget {
 
   Widget _matchCard(Map<String, dynamic> match) {
     final photoUrl = match["photoUrl"] ?? "";
+    final stadiumName =
+        (match["stadiumName"] ?? match["stadium"] ?? "").toString().trim();
+    final typeLabel = _matchTypeLabel(match["type"]?.toString());
+    final displayName = stadiumName.isNotEmpty
+        ? "$typeLabel في $stadiumName"
+        : (match["name"] ?? "").toString();
     return Container(
       width: 350.w,
       constraints: BoxConstraints(minHeight: 150.h),
@@ -323,7 +335,7 @@ class Home extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 CustomText(
-                  match["name"] ?? "",
+                  displayName,
                   fontSize: 18.sp,
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -341,7 +353,7 @@ class Home extends StatelessWidget {
                         icon: Icons.access_time, text: match["time"] ?? ""),
                   ],
                 ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 4.h),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -408,6 +420,18 @@ class Home extends StatelessWidget {
     );
   }
 
+  String _matchTypeLabel(String? type) {
+    switch (type) {
+      case 'challenge':
+        return 'تحدي';
+      case 'activity':
+        return 'نشاط';
+      case 'match':
+      default:
+        return 'مباراة';
+    }
+  }
+
   Widget _iconChip({required IconData icon, required String text}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
@@ -472,11 +496,11 @@ class Home extends StatelessWidget {
                 ),
                 child: GestureDetector(
                     onTap: () {
-                      AppGet.to.changeBottomNavUser(
-                          indexBottomNav: 1,
-                          indexService: 4,
-                          selectMatchType: 0,
-                          selectStadiumData: item);
+                      Get.to(() => StadiumDetailsPage(
+                            stadium: item,
+                            selectedSportId:
+                                AppGet.to.selectedSportId?.toString(),
+                          ));
                     },
                     child: _stadiumCard(item)),
               );
@@ -489,8 +513,6 @@ class Home extends StatelessWidget {
 
   Widget _stadiumCard(Map<String, dynamic> stadium) {
     final imageUrl = stadium["imageUrl"] ?? "";
-    // final location = stadium['location'];
-    // printLog(location);
     return Container(
       width: 340.w,
       decoration: BoxDecoration(
@@ -556,8 +578,9 @@ class Home extends StatelessWidget {
                               SizedBox(width: 6.w),
                               Flexible(
                                 child: CustomText(
+                                  stadium["location"] ?? "",
+                                  // 'شارع المدينة',
                                   // stadium["location"] ?? "",
-                                  'شارع المدينة', 
                                   fontSize: 14.sp,
                                   color: Colors.white,
                                   maxLines: 1,
@@ -601,7 +624,7 @@ class Home extends StatelessWidget {
                             ),
                             SizedBox(height: 2.h),
                             CustomText(
-                              "homeCurrencyPerHour".tr,
+                              _resolveCurrencyPerHour(stadium),
                               fontSize: 11.sp,
                               color: AppColors.green,
                             ),
@@ -710,6 +733,41 @@ class Home extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _resolveCurrencyPerHour(Map stadium) {
+    final lang = Get.locale?.languageCode ?? 'ar';
+    final locationMap = _extractCurrencySource(stadium);
+    final currencyName =
+        locationMap['currency_name'] ?? locationMap['currencyName'];
+    final currencyCode = locationMap['currency'] ?? locationMap['currencyCode'];
+    if (lang == 'ar') {
+      final label = (currencyName?.toString().trim().isNotEmpty == true)
+          ? currencyName.toString().trim()
+          : (currencyCode?.toString().trim().isNotEmpty == true)
+              ? currencyCode.toString().trim()
+              : 'ريال';
+      return '$label / س';
+    }
+    final label = (currencyCode?.toString().trim().isNotEmpty == true)
+        ? currencyCode.toString().trim()
+        : (currencyName?.toString().trim().isNotEmpty == true)
+            ? currencyName.toString().trim()
+            : 'OMR';
+    return '$label / hour';
+  }
+
+  Map<String, dynamic> _extractCurrencySource(Map stadium) {
+    final locationData = stadium['locationData'];
+    if (locationData is Map<String, dynamic>) return locationData;
+    if (locationData is Map) return Map<String, dynamic>.from(locationData);
+    final location = stadium['location'];
+    if (location is Map<String, dynamic>) return location;
+    if (location is Map) return Map<String, dynamic>.from(location);
+    final countryData = stadium['countryData'];
+    if (countryData is Map<String, dynamic>) return countryData;
+    if (countryData is Map) return Map<String, dynamic>.from(countryData);
+    return {};
   }
 }
 

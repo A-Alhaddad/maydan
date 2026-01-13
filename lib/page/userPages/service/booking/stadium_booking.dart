@@ -77,8 +77,7 @@ class StadiumBooking extends StatelessWidget {
                       onTap: () {
                         selectedDurationMinutes = d;
                         selectedTimeIndices.clear();
-                        controller.updateScreen(
-                            nameScreen: ['StadiumBooking']);
+                        controller.updateScreen(nameScreen: ['StadiumBooking']);
                       },
                     ),
                   )
@@ -263,7 +262,7 @@ class StadiumBooking extends StatelessWidget {
                                           item['id']?.toString()
                                       ? AppColors.green
                                       : Colors.transparent)
-                                  : (controller.selectStadium['id']
+                                  : (AppGet.to.selectStadium['id']
                                               ?.toString() ==
                                           item['id']?.toString()
                                       ? AppColors.green
@@ -439,9 +438,9 @@ class StadiumBooking extends StatelessWidget {
       'DEC'
     ];
 
-    return List.generate(7, (index) {
-      final date = DateTime(now.year, now.month, now.day)
-          .add(Duration(days: index));
+    return List.generate(35, (index) {
+      final date =
+          DateTime(now.year, now.month, now.day).add(Duration(days: index));
       final weekdayIndex = date.weekday - 1;
       return _DayItem(
         date: date,
@@ -516,8 +515,8 @@ class StadiumBooking extends StatelessWidget {
     if (ranges.isEmpty) {
       final workingHours = stadium['workingHours'] ?? stadium['working_hours'];
       if (workingHours is Map) {
-        final dayData = workingHours[day.dayKey] ??
-            workingHours[day.dayKey.toUpperCase()];
+        final dayData =
+            workingHours[day.dayKey] ?? workingHours[day.dayKey.toUpperCase()];
         ranges.addAll(_parseRangeList(dayData, day.date));
       }
     }
@@ -626,7 +625,8 @@ class StadiumBooking extends StatelessWidget {
   }
 
   double _parsePrice(Map<String, dynamic> stadium) {
-    final raw = stadium['price'] ?? stadium['hour_price'] ?? stadium['hourPrice'];
+    final raw =
+        stadium['price'] ?? stadium['hour_price'] ?? stadium['hourPrice'];
     final value = double.tryParse(raw?.toString() ?? '');
     return value ?? 0;
   }

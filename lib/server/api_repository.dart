@@ -98,6 +98,23 @@ class ApiRepository {
     );
   }
 
+  Future<ApiResult<dynamic>> getStadiumAvailability({
+    required String stadiumId,
+    required String from,
+    required String to,
+    required int slotMinutes,
+  }) {
+    return api.request<dynamic>(
+      path: '/stadiums/$stadiumId/availability',
+      query: {
+        'from': from,
+        'to': to,
+        'slot': slotMinutes,
+      },
+      decoder: (data) => data,
+    );
+  }
+
   Future<ApiResult<List<dynamic>>> getCountries() {
     return api.request<List<dynamic>>(
       path: '/countries',
@@ -220,6 +237,16 @@ class ApiRepository {
       method: 'POST',
       auth: true,
       data: body,
+      decoder: _asMap,
+    );
+  }
+
+  Future<ApiResult<Map<String, dynamic>>> getReservationDetails(
+      String reservationId) {
+    return api.request<Map<String, dynamic>>(
+      path: '/reservations/$reservationId',
+      method: 'GET',
+      auth: true,
       decoder: _asMap,
     );
   }

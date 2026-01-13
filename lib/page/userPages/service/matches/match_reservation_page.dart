@@ -51,6 +51,7 @@ class MatchReservationPage extends StatelessWidget {
         final String imageUrl =
             match[newBooking ? "imageUrl" : "photoUrl"] ?? "";
         final Object price = match["price"] ?? 0;
+        final playersNumber = _resolvePlayersNumber(match, controller);
 
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
@@ -76,7 +77,7 @@ class MatchReservationPage extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 20.w),
                       child: Column(
                         children: [
-                          if(newBooking)
+                          if (newBooking)
                             Column(
                               children: [
                                 SectionHeader(
@@ -93,18 +94,20 @@ class MatchReservationPage extends StatelessWidget {
                                       child: GestureDetector(
                                         onTap: () {
                                           selectPay = 1;
-                                          AppGet.to.updateScreen(
-                                              nameScreen: ['MatchReservationPage']);
+                                          AppGet.to.updateScreen(nameScreen: [
+                                            'MatchReservationPage'
+                                          ]);
                                         },
                                         child: Container(
                                           height: 45.h,
                                           width: double.infinity,
-                                          padding:
-                                          EdgeInsets.symmetric(horizontal: 20.w),
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 20.w),
                                           decoration: BoxDecoration(
                                             color: selectPay == 1
                                                 ? AppColors.green
-                                                : Colors.white.withOpacity(0.06),
+                                                : Colors.white
+                                                    .withOpacity(0.06),
                                             borderRadius: BorderRadius.all(
                                               Radius.circular(40.r),
                                             ),
@@ -141,18 +144,20 @@ class MatchReservationPage extends StatelessWidget {
                                       child: GestureDetector(
                                         onTap: () {
                                           selectPay = 2;
-                                          AppGet.to.updateScreen(
-                                              nameScreen: ['MatchReservationPage']);
+                                          AppGet.to.updateScreen(nameScreen: [
+                                            'MatchReservationPage'
+                                          ]);
                                         },
                                         child: Container(
                                           height: 45.h,
                                           width: double.infinity,
-                                          padding:
-                                          EdgeInsets.symmetric(horizontal: 20.w),
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 20.w),
                                           decoration: BoxDecoration(
                                             color: selectPay == 2
                                                 ? AppColors.green
-                                                : Colors.white.withOpacity(0.06),
+                                                : Colors.white
+                                                    .withOpacity(0.06),
                                             borderRadius: BorderRadius.all(
                                               Radius.circular(40.r),
                                             ),
@@ -196,30 +201,26 @@ class MatchReservationPage extends StatelessWidget {
                             showMore: false,
                           ),
                           SizedBox(height: 18.h),
-                          SizedBox(
-                            height: 260.h,
-                            width: double.infinity,
-                            child: _buildPlayersGrid(),
-                          ),
-                          if(newBooking)
-                          Column(
-                            children: [
-                              SizedBox(height: 25.h),
-                              SectionHeader(
-                                iconName: "icon15",
-                                title: "aboutStadium".tr,
-                                showMore: false,
-                              ),
-                              SizedBox(
-                                height: 10.h,
-                              ),
-                              typeDetails(key: 'location', value: stadiumLoc),
-                              typeDetails(key: 'fansStand', value: 'لا يوجد'),
-                              typeDetails(key: 'size', value: '36x27 م'),
-                              typeDetails(
-                                  key: 'services', value: 'كرة - زجاجة ماء'),
-                            ],
-                          ),
+                          _buildPlayersGrid(playersNumber),
+                          if (newBooking)
+                            Column(
+                              children: [
+                                SizedBox(height: 25.h),
+                                SectionHeader(
+                                  iconName: "icon15",
+                                  title: "aboutStadium".tr,
+                                  showMore: false,
+                                ),
+                                SizedBox(
+                                  height: 10.h,
+                                ),
+                                typeDetails(key: 'location', value: stadiumLoc),
+                                typeDetails(key: 'fansStand', value: 'لا يوجد'),
+                                typeDetails(key: 'size', value: '36x27 م'),
+                                typeDetails(
+                                    key: 'services', value: 'كرة - زجاجة ماء'),
+                              ],
+                            ),
 
                           SizedBox(height: 24.h),
 
@@ -481,98 +482,114 @@ class MatchReservationPage extends StatelessWidget {
 
   // ================= PLAYERS AREA ================= //
 
-  Widget _buildPlayersGrid() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(
-              3,
-              (index) {
-                final item = newBooking
-                    ? AppGet.to.newSlots[index]
-                    : AppGet.to.leftSlots[index];
-                return _playerSlot(
-                  name: item["name"],
-                  image: item["image"],
-                  indexPlayer: item["indexPlayer"],
-                );
-              },
-            ),
-          ),
-        ),
-        SizedBox(
-          width: 20.w,
-        ),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(
-              2,
-              (index) {
-                final item = newBooking
-                    ? AppGet.to.newSlots[index]
-                    : AppGet.to.leftSlots2[index];
-                return _playerSlot(
-                  name: item["name"],
-                  image: item["image"],
-                  indexPlayer: item["indexPlayer"],
-                );
-              },
-            ),
-          ),
-        ),
+  Widget _buildPlayersGrid(int playersNumber) {
+    return _buildSeatGrid(playersNumber);
+  }
 
-        // الخط الفاصل
-        Container(
-          width: 1.5.w,
-          margin: EdgeInsets.symmetric(horizontal: 20.w),
-          height: 360.h,
-          color: AppColors.green,
-        ),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(
-              2,
-              (index) {
-                final item = newBooking
-                    ? AppGet.to.newSlots[index]
-                    : AppGet.to.rightSlots2[index];
-                return _playerSlot(
-                  name: item["name"],
-                  image: item["image"],
-                  indexPlayer: item["indexPlayer"],
-                );
-              },
+  Widget _buildSeatGrid(int playersNumber) {
+    if (playersNumber <= 0) {
+      return CustomText(
+        "لا توجد أماكن متاحة",
+        fontSize: 13.sp,
+        color: Colors.white.withOpacity(0.7),
+      );
+    }
+    final leftCount = (playersNumber / 2).ceil();
+    final rightCount = playersNumber - leftCount;
+    final leftOuterCount = (leftCount + 1) ~/ 2;
+    final leftInnerCount = leftCount ~/ 2;
+    final rightInnerCount = rightCount ~/ 2;
+    final rightOuterCount = (rightCount + 1) ~/ 2;
+
+    final seats = List.generate(playersNumber, (i) => (i + 1).toString());
+    final leftOuter = seats.take(leftOuterCount).toList();
+    final leftInner = seats.skip(leftOuterCount).take(leftInnerCount).toList();
+    final rightInner = seats
+        .skip(leftOuterCount + leftInnerCount)
+        .take(rightInnerCount)
+        .toList();
+    final rightOuter = seats
+        .skip(leftOuterCount + leftInnerCount + rightInnerCount)
+        .take(rightOuterCount)
+        .toList();
+
+    return SizedBox(
+      height: 260.h,
+      width: double.infinity,
+      child: Row(
+        children: [
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildSeatColumn(leftOuter),
+                _buildSeatColumn(leftInner),
+              ],
             ),
           ),
-        ),
-        SizedBox(
-          width: 20.w,
-        ),
-        // العمود اليمين (5 مربعات)
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(
-              3,
-              (index) {
-                final item = newBooking
-                    ? AppGet.to.newSlots[index]
-                    : AppGet.to.rightSlots[index];
-                return _playerSlot(
-                  name: item["name"],
-                  image: item["image"],
-                  indexPlayer: item["indexPlayer"],
-                );
-              },
+          Container(
+            width: 1.5.w,
+            margin: EdgeInsets.symmetric(horizontal: 12.w),
+            height: 220.h,
+            color: Colors.white.withOpacity(0.2),
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildSeatColumn(rightInner),
+                _buildSeatColumn(rightOuter),
+              ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSeatColumn(List<String> seats) {
+    if (seats.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final MainAxisAlignment alignment;
+    if (seats.length == 1) {
+      alignment = MainAxisAlignment.center;
+    } else if (seats.length == 2) {
+      alignment = MainAxisAlignment.spaceEvenly;
+    } else {
+      alignment = MainAxisAlignment.spaceBetween;
+    }
+    return Column(
+      mainAxisAlignment: alignment,
+      children: seats.map(_buildSeatTile).toList(),
+    );
+  }
+
+  Widget _buildSeatTile(String seat) {
+    final selected = seat == index;
+    return GestureDetector(
+      onTap: () {
+        index = seat;
+        AppGet.to.update(['MatchReservationPage']);
+      },
+      child: Container(
+        width: 75.w,
+        height: 75.w,
+        decoration: BoxDecoration(
+          color: selected ? AppColors.green : Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color: selected ? AppColors.green : Colors.white.withOpacity(0.2),
+            width: 1.5,
+          ),
         ),
-      ],
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.add,
+          size: 28.sp,
+          color: selected ? Colors.black : Colors.white,
+        ),
+      ),
     );
   }
 
@@ -723,5 +740,50 @@ class MatchReservationPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  int _resolvePlayersNumber(Map<String, dynamic> match, AppGet controller) {
+    final cached = controller.bookingPlayersNumber;
+    if (cached != null && cached > 0) return cached;
+
+    final direct = match['players_number'] ??
+        match['playersNumber'] ??
+        match['players'] ??
+        match['slots'];
+    final directValue = int.tryParse(direct?.toString() ?? '');
+    if (directValue != null && directValue > 0) return directValue;
+
+    final sports = match['sports'];
+    String? targetSportId =
+        controller.bookingSportId ?? controller.selectedSportId?.toString();
+    if (targetSportId == null || targetSportId.isEmpty) {
+      targetSportId = match['sportId']?.toString();
+    }
+    if (sports is List && sports.isNotEmpty) {
+      Map<String, dynamic>? selected;
+      if (targetSportId != null && targetSportId.isNotEmpty) {
+        for (final entry in sports) {
+          if (entry is! Map) continue;
+          final id = entry['id'] ?? entry['sport_id'];
+          if (id != null && id.toString() == targetSportId) {
+            selected = Map<String, dynamic>.from(entry);
+            break;
+          }
+        }
+      }
+      selected ??= sports.first is Map<String, dynamic>
+          ? Map<String, dynamic>.from(sports.first as Map<String, dynamic>)
+          : null;
+      if (selected != null) {
+        final raw = selected['players_number'] ??
+            selected['playersNumber'] ??
+            selected['players'] ??
+            selected['slots'];
+        final value = int.tryParse(raw?.toString() ?? '');
+        if (value != null && value > 0) return value;
+      }
+    }
+
+    return 10;
   }
 }

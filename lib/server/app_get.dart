@@ -57,6 +57,19 @@ class AppGet extends GetxController {
   String? citiesCountryId;
   int? selectedSportId;
   Map<String, dynamic> selectStadium = {};
+  double? selectedStadiumHourlyPrice;
+  int? bookingMatchTypeIndex;
+  int? bookingDurationMinutes;
+  String? bookingDateKey;
+  String? bookingDayLabel;
+  String? bookingTimeLabel;
+  String? bookingTimeStart;
+  String? bookingTimeEnd;
+  double? bookingTotalPrice;
+  String? bookingSportId;
+  int? bookingPlayersNumber;
+  int? bookingPayOption;
+  int? bookingSeatIndex;
   Map<String, dynamic>? currentUser;
   String? userName;
   String? userImageUrl;
@@ -70,6 +83,7 @@ class AppGet extends GetxController {
   double? userLat;
   double? userLng;
   bool isSportLoading = false;
+  String? bookingReservationId;
 
   //////////////////// init ///////////////////////////
   @override
@@ -90,7 +104,9 @@ class AppGet extends GetxController {
     if (AppPreferences().getTokenUser.isNotEmpty) {
       await fetchUserProfile(silent: true);
     }
-    await loadHomeData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadHomeData();
+    });
   }
 
   void initLanguage() {
@@ -1161,6 +1177,21 @@ class AppGet extends GetxController {
           final city = stadium['city'] ?? reservableData['city'] ?? map['city'];
           final country =
               stadium['country'] ?? reservableData['country'] ?? map['country'];
+          final stadiumName = stadium['name'] ??
+              reservableData['name'] ??
+              map['stadium_name'] ??
+              map['stadiumName'] ??
+              map['reservable_name'];
+          final stadiumImage = _extractImageUrl(stadium['image']);
+          final reservableImageUrl = _extractImageUrl(reservableImages);
+          final stadiumImagesUrl = _extractImageUrl(stadium['images']);
+          final photoUrl = stadiumImage.isNotEmpty
+              ? stadiumImage
+              : (reservableImageUrl.isNotEmpty
+                  ? reservableImageUrl
+                  : (stadiumImagesUrl.isNotEmpty
+                      ? stadiumImagesUrl
+                      : sport['image']?.toString() ?? ''));
           return {
             'id': map['id']?.toString() ?? '',
             'name': map['name']?.toString() ??
@@ -1174,17 +1205,12 @@ class AppGet extends GetxController {
             'price': map['price']?.toString() ??
                 stadium['hour_price']?.toString() ??
                 'مجانا',
-            'photoUrl': stadium['image']?.toString() ??
-                (reservableImages.isNotEmpty
-                    ? reservableImages.first.toString()
-                    : (stadium['images'] is List &&
-                            (stadium['images'] as List).isNotEmpty
-                        ? stadium['images'][0].toString()
-                        : sport['image']?.toString() ?? '')),
+            'photoUrl': photoUrl,
             'photo': 'stadiumImg',
             'type': type,
             'sportId': sportId,
             'sport_ids': map['sport_ids'] ?? map['sports'] ?? sport['id'],
+            'stadiumName': stadiumName?.toString() ?? '',
           };
         })
         .where((m) => m['id'] != '')
@@ -1254,12 +1280,35 @@ class AppGet extends GetxController {
             'name': map['name']?.toString() ?? 'الملعب',
             'location': _composeLocation(map,
                 city: map['city'], country: map['country']),
+            'locationData': map['location'] is Map ? map['location'] : null,
+            'countryData': map['country'] is Map ? map['country'] : null,
+            'description': map['description']?.toString() ??
+                meta['description']?.toString() ??
+                '',
+            'amenities': map['amenities'] ?? const [],
             'price': price?.toString() ?? '0',
             'size': sizeVal?.toString() ?? 'غير محدد',
-            'imageUrl': map['image']?.toString() ??
-                (map['images'] is List && map['images'].isNotEmpty
-                    ? map['images'][0].toString()
-                    : ''),
+            'slotDurations': map['slot_durations'] ??
+                map['slotDurations'] ??
+                meta['slot_durations'] ??
+                meta['slotDurations'] ??
+                const [],
+            'availability':
+                map['availability'] ?? meta['availability'] ?? const [],
+            'workingHours':
+                map['working_hours'] ?? map['workingHours'] ?? const {},
+            'closedDays': map['closed_days'] ??
+                map['closedDays'] ??
+                meta['closed_days'] ??
+                const [],
+            'images': map['images'] ?? const [],
+            'sports': sports,
+            'imageUrl': (() {
+              final primary = _extractImageUrl(map['image']);
+              return primary.isNotEmpty
+                  ? primary
+                  : _extractImageUrl(map['images']);
+            })(),
             'image': 'stadiumImg',
             'sportIds': sports
                 .map((e) =>
@@ -1361,6 +1410,24 @@ class AppGet extends GetxController {
       List<Map<String, dynamic>>? data, List<Map<String, dynamic>> fallback) {
     if (data != null && data.isNotEmpty) return data;
     return fallback;
+  }
+
+  String _extractImageUrl(dynamic images) {
+    if (images == null) return '';
+    if (images is String) return images;
+    if (images is Map) {
+      final url = images['url'] ?? images['path'] ?? images['image'];
+      return url?.toString() ?? '';
+    }
+    if (images is List && images.isNotEmpty) {
+      final first = images.first;
+      if (first is Map) {
+        final url = first['url'] ?? first['path'] ?? first['image'];
+        return url?.toString() ?? '';
+      }
+      return first.toString();
+    }
+    return '';
   }
 
   Future<void> fetchCountries() async {
